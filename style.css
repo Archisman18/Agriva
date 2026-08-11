@@ -1,0 +1,603 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* Universal Box-Sizing and Smooth Scroll */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+/* Global Typography and Color Variables */
+:root {
+    --primary-green: #38a169;
+    --dark-green: #1d673f;
+    --accent-gold: #fbd38d;
+    --text-dark: #333;
+    --text-light: #f0f0f0;
+    --bg-light: #f9f9f9;
+    --bg-dark: #2c3e50; /* A dark shade for contrast */
+    --shadow-light: rgba(75, 75, 75, 0.144);
+    --shadow-dark: rgba(0, 0, 0, 0.3);
+}
+
+span {
+    color: var(--primary-green);
+}
+
+span.gold {
+    color: var(--accent-gold);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background-color: var(--bg-light);
+}
+
+ul {
+    list-style: none;
+}
+
+/* Navigation Bar */
+nav {
+    z-index: 1000000;
+    width: 100%;
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    transition: background 0.5s ease, padding 0.5s ease;
+    /* Set initial background to transparent */
+    background: transparent;
+    box-shadow: none; /* Remove shadow initially */
+}
+
+nav.scroll {
+    background: #1a202c; /* Dark background color on scroll */
+    padding: 1rem 4rem; /* Slightly reduced padding on scroll */
+    box-shadow: 0 2px 10px var(--shadow-dark);
+}
+
+nav .logo h1 {
+    font-size: 30px;
+    color: var(--text-light);
+    font-weight: 700;
+}
+
+nav .links ul {
+    display: flex;
+    gap: 30px; /* Use gap for spacing */
+}
+
+nav .links ul li a {
+    text-transform: capitalize;
+    text-decoration: none;
+    font-weight: 500;
+    color: var(--text-light);
+    transition: color 0.3s ease;
+    position: relative; /* For underline effect */
+}
+
+nav .links ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background: var(--primary-green);
+    left: 0;
+    bottom: -5px;
+    transition: width 0.3s ease;
+}
+
+nav .links ul li a:hover::after {
+    width: 100%;
+}
+
+nav.scroll .links ul li a::after {
+    background: var(--accent-gold);
+}
+
+nav .links ul li a:hover {
+    color: var(--primary-green);
+}
+
+nav.scroll .links ul li a:hover {
+    color: var(--accent-gold); /* Lighter hover color on dark background */
+}
+
+nav .button ul li.tryit {
+    background: var(--primary-green);
+    padding: 10px 20px;
+    border-radius: 50px; /* More rounded button */
+    box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+nav .button ul li.tryit:hover {
+    background: #2ea85f; /* Slightly darker green on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(72, 187, 120, 0.6);
+}
+
+nav.scroll .button ul li.tryit {
+    background-color: var(--primary-green); /* Keep primary green for the button */
+    box-shadow: 0px 5px 15px rgba(72, 187, 120, 0.5);
+}
+
+nav.scroll .button ul li.tryit:hover {
+    background-color: #2ea85f; /* Slightly darker green on hover */
+    transform: translateY(-2px);
+    box-shadow: 0px 7px 20px rgba(72, 187, 120, 0.7);
+}
+
+nav .button ul li.tryit a {
+    text-decoration: none;
+    text-transform: capitalize;
+    color: var(--text-light);
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+nav.scroll .button ul li.tryit a {
+    color: var(--text-light); /* Keep text light for contrast on green */
+}
+
+/* ------------------------------------------------------------ */
+/* Home Section */
+.home {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden; /* Ensure video doesn't overflow */
+}
+
+.home .overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.6); /* Darker overlay for better text readability */
+    display: flex; /* Use flexbox for centering content */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    padding: 0 20px; /* Add some padding for smaller screens */
+    z-index: 10; /* Ensure content is above video */
+}
+
+.home .overlay .content {
+    color: var(--text-light);
+    max-width: 900px; /* Limit content width */
+    z-index: 1; /* Ensure content is above overlay background */
+}
+
+.home .overlay .content h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem); /* Responsive font size */
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.home .overlay .content h1 span.gold {
+    color: var(--accent-gold);
+}
+
+.home .overlay .content h1 span {
+    color: #37e187; /* A vibrant green for emphasis */
+}
+
+.home .overlay .content p {
+    font-size: clamp(1rem, 2vw, 1.25rem); /* Responsive font size */
+    text-align: center;
+    text-transform: capitalize;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.home .overlay .content a.explore-button {
+    background-color: var(--accent-gold);
+    color: var(--text-dark);
+    box-shadow: 0px 5px 15px rgba(251, 211, 141, 0.5);
+    margin-top: 25px;
+    display: inline-block;
+    padding: 15px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.home .overlay .content a.explore-button:hover {
+    background-color: #e6c27e;
+    transform: translateY(-3px);
+    box-shadow: 0px 8px 20px rgba(251, 211, 141, 0.7);
+}
+
+.home video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1; /* Place video behind overlay */
+}
+
+/* ------------------------------------------------------------ */
+/* General Section Styling */
+section {
+    padding: 100px 4rem; /* Consistent padding for all sections */
+    margin-top: 0; /* Reset margin-top from inline style */
+    scroll-margin-top: 80px; /* Account for fixed nav bar */
+    position: relative;
+    overflow: hidden; /* Clear floats/prevent content overflow */
+}
+
+section:nth-of-type(even) {
+    background-color: var(--bg-light); /* Alternate background for visual separation */
+}
+
+section:nth-of-type(odd):not(.home) {
+    background-color: #fff;
+}
+
+section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px; /* Inner padding for container */
+}
+
+section .title {
+    text-align: center;
+    margin-bottom: 60px;
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--dark-green);
+}
+
+section .title h1 {
+    text-transform: capitalize;
+    position: relative;
+    display: inline-block;
+}
+
+section .title h1::after {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 4px;
+    background: var(--primary-green);
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -10px;
+    border-radius: 2px;
+}
+
+/* Key Features Section */
+section.keyfeatures {
+    background: linear-gradient(to bottom, #fff 0%, #e6ffe6 100%); /* Subtle gradient for flow */
+}
+
+section.keyfeatures .row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px; /* Increased gap for better spacing */
+}
+
+section.keyfeatures .row .col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 30px;
+    width: 100%; /* Full width on small screens */
+    max-width: 350px; /* Max width for cards */
+    min-height: 250px; /* Ensure consistent height */
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px var(--shadow-light);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+section.keyfeatures .row .col:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(75, 75, 75, 0.25);
+}
+
+section.keyfeatures .row .col .icon {
+    margin-bottom: 20px;
+}
+
+section.keyfeatures .row .col .icon i {
+    font-size: 55px; /* Larger icons */
+    color: var(--primary-green);
+    transition: transform 0.3s ease;
+}
+
+section.keyfeatures .row .col:hover .icon i {
+    transform: scale(1.1);
+}
+
+section.keyfeatures .row .col h1 {
+    margin-bottom: 15px;
+    font-size: 24px;
+    color: var(--dark-green);
+    text-transform: capitalize;
+}
+
+section.keyfeatures .row .col p {
+    color: #555;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+/* Purpose of It Section */
+section.purpose_of_it {
+    background-color: #f0f8f0; /* Light green background */
+    padding: 100px 4rem;
+    position: relative;
+    z-index: 1; /* Ensure it's above other elements if needed */
+}
+
+section.purpose_of_it .content {
+    max-width: 900px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    text-align: justify; /* Justify text content */
+    color: #444;
+}
+
+section.purpose_of_it .content p {
+    margin-bottom: 20px;
+}
+
+/* How It Works Section */
+section.howitworks {
+    background-color: #fff; /* White background */
+    padding: 100px 4rem;
+    position: relative;
+    z-index: 1;
+}
+
+section.howitworks .content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+section.howitworks ol {
+    counter-reset: my-awesome-counter; /* Initialize counter */
+    list-style: none; /* Remove default list style */
+    padding: 0;
+}
+
+section.howitworks ol li {
+    counter-increment: my-awesome-counter; /* Increment counter */
+    margin-bottom: 40px;
+    position: relative;
+    padding-left: 70px; /* Space for the custom number */
+}
+
+section.howitworks ol li::before {
+    content: counter(my-awesome-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-green);
+    color: var(--text-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    box-shadow: 0 5px 15px rgba(56, 161, 105, 0.4);
+}
+
+section.howitworks ol li h2 {
+    font-size: 22px;
+    color: var(--dark-green);
+    margin-bottom: 10px;
+}
+
+section.howitworks ol li p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #555;
+}
+
+section.howitworks ul {
+    margin-top: 20px;
+    padding-left: 20px;
+    list-style: disc; /* Use disc for sub-list */
+    color: #555;
+}
+
+section.howitworks ul li {
+    margin-bottom: 10px;
+    padding-left: 0; /* Reset padding for sub-list items */
+}
+
+section.howitworks ul li::before {
+    content: none; /* Remove custom number for sub-list */
+}
+
+/* Footer Styling */
+footer {
+    background-color: var(--dark-green);
+    color: var(--text-light);
+    text-align: center;
+    padding: 30px 0;
+    font-size: 15px;
+    margin-top: 0; /* Ensure no extra margin */
+    box-shadow: 0 -2px 10px var(--shadow-dark);
+}
+
+footer span {
+    color: var(--accent-gold);
+}
+
+/* Responsive Design Breakpoints */
+
+/* Tablet and larger phones */
+@media (max-width: 1024px) {
+    nav {
+        padding: 1.5rem 2rem;
+    }
+
+    nav.scroll {
+        padding: 1rem 2rem;
+    }
+
+    .home .overlay .content h1 {
+        font-size: clamp(2rem, 6vw, 4rem);
+    }
+
+    .home .overlay .content p {
+        width: auto; /* Allow paragraph to take full width */
+        padding: 0 15px;
+    }
+
+    section {
+        padding: 80px 2rem;
+    }
+
+    section .title {
+        font-size: clamp(1.8rem, 5vw, 2.2rem);
+    }
+
+    section.keyfeatures .row .col {
+        max-width: 320px;
+    }
+}
+
+/* Smaller phones and portrait tablets */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        padding: 1rem 1rem;
+        align-items: flex-start; /* Align items to start when stacked */
+    }
+
+    nav .logo {
+        margin-bottom: 10px; /* Space between logo and links */
+    }
+
+    nav .links ul {
+        flex-direction: column;
+        gap: 10px; /* Reduced gap for vertical links */
+        margin-top: 0; /* Reset margin-top */
+        width: 100%; /* Make links take full width */
+        text-align: center;
+    }
+
+    nav .links ul li {
+        padding-left: 0; /* Remove left padding for stacked links */
+    }
+
+    nav .button {
+        margin-top: 15px;
+        width: 100%; /* Make button take full width */
+        text-align: center;
+    }
+
+    nav .button ul {
+        justify-content: center; /* Center the button within its container */
+    }
+
+    nav.scroll {
+        padding: 0.8rem 1rem;
+    }
+
+    .home .overlay .content h1 {
+        font-size: clamp(1.8rem, 8vw, 3.5rem);
+    }
+
+    .home .overlay .content p {
+        font-size: clamp(0.9rem, 3vw, 1.1rem);
+        padding: 0 10px; /* Slightly less padding on very small screens */
+    }
+
+    section {
+        padding: 60px 1rem;
+    }
+
+    section .title {
+        font-size: clamp(1.6rem, 6vw, 2rem);
+    }
+
+    section.keyfeatures .row .col {
+        width: 100%; /* Full width on mobile */
+        max-width: 350px; /* Limit max width for better appearance */
+    }
+
+    section.howitworks ol li {
+        padding-left: 60px;
+    }
+
+    section.howitworks ol li::before {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    section.purpose_of_it .content,
+    section.howitworks .content p {
+        font-size: 1rem; /* Adjust base font size for readability */
+    }
+}
+
+/* Extra small phones (e.g., iPhone SE) */
+@media (max-width: 480px) {
+    nav .logo h1 {
+        font-size: 25px;
+    }
+
+    nav .links ul li a {
+        font-size: 0.9rem;
+    }
+
+    nav .button ul li.tryit {
+        padding: 8px 18px;
+    }
+
+    .home .overlay .content h1 {
+        font-size: clamp(1.5rem, 9vw, 3rem);
+    }
+
+    .home .overlay .content p {
+        font-size: clamp(0.85rem, 4vw, 1rem);
+        padding: 0 5px; /* Minimal padding for very small screens */
+    }
+
+    section.keyfeatures .row .col h1 {
+        font-size: 20px;
+    }
+
+    section.keyfeatures .row .col p {
+        font-size: 14px;
+    }
+
+    section.purpose_of_it .content,
+    section.howitworks .content p {
+        font-size: 0.9rem; /* Further adjust for very small screens */
+    }
+}
+
+/* Ensure consistent content alignment for justified text */
+section .content {
+    text-align: justify; /* Apply to all content blocks where justification is desired */
+    hyphens: auto; /* Enable hyphenation for better justification */
+}

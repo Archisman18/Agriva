@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm-IQ: Your personal farming assistant</title>
+    <!-- Favicon (using an emoji) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        /* Embedded style.css content with green gradient theme */
+        body {
+            font-family: "poppins", sans-serif;
+            background: linear-gradient(to bottom right, #e0ffe0, #c0f0c0); /* Light green gradient */
+            color: #2c5234; /* Dark green text for contrast */
+        }
+        #map {
+            height: 400px; /* Fixed height for the map */
+            width: 100%; /* Full width */
+            border-radius: 0.75rem; /* Rounded corners for map */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+        .container {
+            max-width: 800px; /* Max width for content */
+        }
+        input[type="text"] {
+            padding: 0.75rem 1rem;
+            border: 1px solid #a7d9a7; /* Muted green border */
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            background-color: #f0fff0; /* Very light green input background */
+            color: #2c5234; /* Dark green text for input */
+        }
+        input[type="text"]:focus {
+            border-color: #68d391; /* Brighter green focus ring */
+            box-shadow: 0 0 0 3px rgba(104, 211, 145, 0.25);
+            outline: none;
+        }
+        button {
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.15s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .btn-primary {
+            background-color: #48bb78; /* Medium green */
+            color: white;
+            padding: 10px 15px;
+            box-shadow: 0 4px 6px rgba(72, 187, 120, 0.3); /* Subtle shadow for primary button */
+        }
+        .btn-primary:hover {
+            background-color: #38a169; /* Darker green on hover */
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 6px 8px rgba(72, 187, 120, 0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(0); /* Press effect */
+            box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);
+        }
+        .btn-secondary {
+            background-color: #68d391; /* Lighter green */
+            color: #2c5234;
+                        padding: 10px 15px; /* Dark green text */
+            box-shadow: 0 4px 6px rgba(104, 211, 145, 0.3);
+        }
+        .btn-secondary:hover {
+            background-color: #48bb78; /* Darker lighter green on hover */
+            color: white;
+        }
+        .btn-tertiary { /* Style for "Enter Manually" button */
+            background-color: #fbd38d; /* Keep a contrasting color for distinction */
+            color: #333; /* Darker text for contrast on light orange */
+            box-shadow: 0 4px 6px rgba(251, 211, 141, 0.3);
+        }
+        .btn-tertiary:hover {
+            background-color: #f6ad55; /* Darker orange on hover */
+        }
+        /* Floating window specific styles */
+        #predictionInfoWindow {
+            background-color: rgba(60, 179, 113, 0.9); /* Forest green with transparency */
+            color: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            width: 100%; /* Default to full width on small screens */
+            height: 400px; /* Fixed height to match map */
+            max-width: 90%; /* Responsive max-width */
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto; /* Enable scrolling for content overflow */
+            position: relative; /* Added to make absolute positioning of close button relative to this div */
+        }
+        #predictionInfoWindow .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: absolute; /* Position relative to the info window itself */
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.3rem;
+            transition: background-color 0.2s;
+        }
+        #predictionInfoWindow .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Modal styles */
+        #confirmationModalOverlay, #mapSelectionModalOverlay, #analysisOverlay, #restoreIdModalOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000; /* Above all other content */
+            display: none; /* Hidden by default */
+        }
+
+        #confirmationModal, #mapSelectionModal, #analysisScreen, #restoreIdModal {
+            background-color: #38a169; /* Match a darker green from the theme */
+            color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            text-align: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        #confirmationModal .close-btn, #mapSelectionModal .close-btn, #analysisScreen .close-btn, #restoreIdModal .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.3rem;
+            transition: background-color 0.2s;
+        }
+        #confirmationModal .close-btn:hover, #mapSelectionModal .close-btn:hover, #analysisScreen .close-btn:hover, #restoreIdModal .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading spinner for analysis screen */
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #48bb78; /* Green */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-100 to-green-200 p-4 sm:p-6 md:p-8 flex items-center justify-center min-h-screen">
+    <div id="main-app-content" class="container mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full text-green-800">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-green-700 mb-6 text-center">
+            Farm-IQ: Empowering Smarter Farming Decisions
+        </h1>
+
+        <div class="space-y-6">
+            <!-- Agricultural Field Data Section -->
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <h2 class="text-2xl font-bold text-green-700">Agricultural Field Data</h2>
+                    <!-- Referral ID Section moved here -->
+                    <div class="flex items-center gap-2 bg-green-100 p-2 rounded-lg border border-green-200">
+                        <i class="fa-sharp fa-solid fa-id-card-clip text-green-600 text-xl"></i>
+                        <p id="referralIdDisplay" class="text-xl font-mono text-green-800 break-all">
+                            Generating...
+                        </p>
+                        <button id="copyReferralIdBtn"
+                                class="btn-secondary p-1 rounded-md text-sm flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                            </svg>
+                        </button>
+                        <!-- New button for restoring data -->
+                        <button id="restoreIdBtn"
+                                class="btn-secondary p-1 rounded-md text-sm flex items-center justify-center">
+                            <i class="fa-solid fa-plus text-green-600"></i>
+                        </button>
+                    </div>
+                </div>
+                <p id="copyStatus" class="text-sm text-green-600 mt-2 text-center"></p>
+
+
+                <!-- Buttons for location input choice -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                    <button id="getGpsLocationBtn"
+                            class="btn-primary flex-grow flex items-center justify-center gap-2">
+                        <i class="fa-sharp fa-solid fa-location-dot"></i>
+                        Get GPS Location
+                    </button>
+                    <button id="showManualCoordsBtn"
+                            class="btn-tertiary flex-grow flex items-center justify-center gap-2">
+                        <i class="fa-sharp fa-solid fa-globe"></i>
+                        Enter Coordinates Manually
+                    </button>
+                </div>
+
+                <!-- Manual Coordinate Input (initially hidden) -->
+                <div id="manualCoordsInput" class="hidden space-y-4 mb-4">
+                    <div class="mb-4">
+                        <label for="latitude" class="block text-green-700 text-sm font-semibold mb-2">Latitude:</label>
+                        <input type="text" id="latitude" placeholder="e.g., 30.0444"
+                               class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                    </div>
+                    <div class="mb-4">
+                        <label for="longitude" class="block text-green-700 text-sm font-semibold mb-2">Longitude:</label>
+                        <input type="text" id="longitude" placeholder="e.g., 31.2357"
+                               class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                    </div>
+                    <button id="submitManualCoordsBtn" class="btn-primary w-full">Apply Manual Coordinates</button>
+                </div>
+
+                <!-- Manual Location Text Input -->
+                <div class="mb-4">
+                    <label for="manualLocation" class="block text-green-700 text-sm font-semibold mb-2">Or type your location (e.g., "Cairo, Egypt"):</label>
+                    <input type="text" id="manualLocation" placeholder="e.g., Nile Delta, Egypt"
+                           class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                    <button id="searchManualLocationBtn" class="btn-primary w-full mt-3">
+                        <i class="fa-sharp fa-solid fa-magnifying-glass"></i>
+                        Search Location
+                    </button>
+                </div>
+
+                <p id="locationStatus" class="text-sm text-green-600 mt-2 text-center"></p>
+            </div>
+
+            <!-- Map Display -->
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <h2 class="text-2xl font-bold text-green-700 mb-4">Field Location Map</h2>
+                <!-- New flex container for map and info window -->
+                <div class="flex flex-col lg:flex-row gap-4 items-start mb-4">
+                    <div id="map" class="rounded-lg w-full lg:w-3/5" style="height: 400px;"></div>
+                    <!-- Floating window for prediction info -->
+                    <div id="predictionInfoWindow" class="hidden w-full lg:w-2/5" style="height: 400px;">
+                        <button class="close-btn" onclick="document.getElementById('predictionInfoWindow').style.display='none';">&times;</button>
+                        <h3 class="text-lg font-bold mb-2">Predicted Underwater Source</h3>
+                        <p>Type: <span id="infoType"></span></p>
+                        <p>Volume: <span id="infoVolume"></span></p>
+                        <p>Quality: <span id="infoQuality"></span></p>
+                        <p>Confidence: <span id="infoConfidence"></span></p>
+                        <p>Depth: <span id="infoDepth"></span></p>
+                        <p>Flow Rate: <span id="infoFlowRate"></span></p>
+                        <p>Time to Extract: <span id="infoTimeExtract"></span></p>
+                        <p class="text-sm text-green-200 mt-2">
+                            This is a simulated prediction based on satellite data analysis.
+                        </p>
+                    </div>
+                </div>
+                <!-- New button for satellite view and predicted underwater locations -->
+                <button id="toggleSatelliteViewBtn"
+                        class="btn-primary w-full mt-4 flex items-center justify-center gap-2">
+                    <i class="fa-sharp fa-solid fa-satellite"></i>
+                    Toggle Satellite View & Underwater Predictions
+                </button>
+            </div>
+
+            <!-- Soil Analysis Section -->
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-sharp fa-solid fa-leaf"></i> Soil Analysis</h2>
+                <p>Detected Soil Type: <span id="soilTypeDisplay" class="font-semibold">N/A</span></p>
+                <p class="text-sm text-green-600 mt-2">
+                    Soil type is determined based on satellite spectral analysis of the selected field.
+                </p>
+                <div class="mt-4">
+                    <h3 class="text-lg font-bold text-green-700 mb-2">Closest Water Source (Predicted)</h3>
+                    <p>Source Type: <span id="predictedWaterSourceType" class="font-semibold">N/A</span></p>
+                    <p>Suitable for Agriculture: <span id="predictedWaterSuitability" class="font-semibold">N/A</span></p>
+                    <button id="goToWaterSourceBtn"
+                            class="btn-secondary w-full mt-3 flex items-center justify-center gap-2">
+                        <i class="fa-sharp fa-solid fa-map-marker-alt"></i> View Predicted Source on Map
+                    </button>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-bold text-green-700 mb-2">Manually Selected Water Source</h3>
+                    <p>Source Type: <span id="manualWaterSourceType" class="font-semibold">N/A</span></p>
+                    <p>Suitable for Agriculture: <span id="manualWaterSuitability" class="font-semibold">N/A</span></p>
+                    <button id="selectWaterSourceManuallyBtn"
+                            class="btn-secondary w-full mt-3 flex items-center justify-center gap-2">
+                        <i class="fa-sharp fa-solid fa-hand-pointer"></i> Select Source Manually on Map
+                    </button>
+                    <button id="goToManualWaterSourceBtn"
+                            class="btn-secondary w-full mt-3 flex items-center justify-center gap-2" style="display:none;">
+                        <i class="fa-sharp fa-solid fa-map-marker-alt"></i> View Manually Selected Source
+                    </button>
+                </div>
+            </div>
+
+            <!-- Budget, Tools & Desired Crop Section -->
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-sharp fa-solid fa-dollar-sign"></i> Budget, Tools & Desired Crop</h2>
+                <div class="mb-4">
+                    <label for="budget" class="block text-green-700 text-sm font-semibold mb-2">Estimated Budget ($):</label>
+                    <input type="text" id="budget" placeholder="e.g., 5000"
+                           class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                </div>
+                <div class="mb-4">
+                    <label for="availableTools" class="block text-green-700 text-sm font-semibold mb-2">Available Tools (comma-separated):</label>
+                    <input type="text" id="availableTools" placeholder="e.g., Tractor, Plow, Sprinkler"
+                           class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                </div>
+                <!-- New input for Desired Crop -->
+                <div class="mb-4">
+                    <label for="desiredCrop" class="block text-green-700 text-sm font-semibold mb-2">Desired Crop (e.g., Wheat, Corn, Tomatoes):</label>
+                    <input type="text" id="desiredCrop" placeholder="e.g., Wheat"
+                           class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                </div>
+                <button id="submitBudgetToolsBtn" class="btn-primary w-full">Submit Budget, Tools & Crop</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Results Page (initially hidden) -->
+    <div id="analysisResultsPage" class="container mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full text-green-800 hidden">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-green-700 mb-6 text-center">
+            Farm-IQ Analysis Results
+        </h1>
+        <div class="space-y-6">
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <!-- Flex container for Field Summary heading and button -->
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <h2 class="text-2xl font-bold text-green-700">Field Summary</h2>
+                    <button id="downloadPdfBtn"
+                            class="btn-secondary flex items-center justify-center gap-2 px-4 py-2 text-sm">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        Download PDF
+                    </button>
+                </div>
+                <p><strong>Referral ID:</strong> <span id="resultReferralId" class="font-semibold"></span></p>
+                <p><strong>Field Location:</strong> <span id="resultFieldLocation" class="font-semibold"></span></p>
+                <p><strong>Detected Soil Type:</strong> <span id="resultSoilType" class="font-semibold"></span></p>
+                <p><strong>Predicted Water Source:</strong> <span id="resultPredictedWaterSource" class="font-semibold"></span></p>
+                <p><strong>Manual Water Source:</strong> <span id="resultManualWaterSource" class="font-semibold"></span></p>
+                <p><strong>Estimated Budget:</strong> <span id="resultBudget" class="font-semibold"></span></p>
+                <p><strong>Available Tools:</strong> <span id="resultTools" class="font-semibold"></span></p>
+                <p><strong>Desired Crop:</strong> <span id="resultDesiredCrop" class="font-semibold"></span></p>
+            </div>
+
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <h2 class="text-2xl font-bold text-green-700 mb-4">Satellite Data & Forecasts</h2>
+                <p><i class="fa-solid fa-cloud-showers-heavy mr-2"></i><strong>Rainfall Prediction:</strong> <span id="resultRainfall" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-water mr-2"></i><strong>Soil Moisture Index:</strong> <span id="resultSoilMoisture" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-temperature-half mr-2"></i><strong>Temperature:</strong> <span id="resultTemperature" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-calendar-alt mr-2"></i><strong>Seasonal Forecast:</strong> <span id="resultSeasonalForecast" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-mountain mr-2"></i><strong>Land Elevation:</strong> <span id="resultElevation" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-angle-double-up mr-2"></i><strong>Slope Data:</strong> <span id="resultSlope" class="font-semibold"></span></p>
+            </div>
+
+            <!-- New section for Climate Risk Alerts - Updated with icons -->
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Climate Risk Alerts</h2>
+                <p><i class="fa-solid fa-house-flood-water mr-2"></i><strong>Flood Risk:</strong> <span id="resultFloodRisk" class="font-semibold">N/A</span></p>
+                <p><i class="fa-solid fa-sun-plant-wilt mr-2"></i><strong>Drought Risk:</strong> <span id="resultDroughtRisk" class="font-semibold">N/A</span></p>
+                <p class="text-sm text-green-600 mt-2">
+                    These alerts are based on simulated climate models and satellite data for your selected field and crop.
+                </p>
+            </div>
+
+            <!-- Section for Desired Crop Suitability Analysis -->
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-seedling"></i> Desired Crop Suitability Analysis</h2>
+                <p><strong>Possibility of Growing <span id="resultCropName" class="font-semibold"></span>:</strong> <span id="resultCropSuitability" class="font-semibold"></span></p>
+                <p class="mt-2"><strong>Reasons:</strong></p>
+                <ul id="resultCropSuitabilityReasons" class="list-disc list-inside ml-4 text-green-600">
+                    <!-- Reasons will be populated here -->
+                </ul>
+            </div>
+
+            <!-- New section for Best Crop Recommendation -->
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-hand-holding-seedling"></i> Best Crop Recommendation</h2>
+                <p><strong>Recommended Crop:</strong> <span id="resultBestCropRecommendation" class="font-semibold">N/A</span></p>
+                <p class="mt-2"><strong>Recommendation Reasons:</strong></p>
+                <ul id="resultBestCropRecommendationReasons" class="list-disc list-inside ml-4 text-green-600">
+                    <!-- Reasons will be populated here -->
+                </ul>
+            </div>
+
+            <!-- New section for Crop Rotation Planner -->
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-rotate mr-2"></i> Crop Rotation Planner</h2>
+                <p><strong>Rotation Strategy:</strong> <span id="resultRotationStrategy" class="font-semibold">N/A</span></p>
+                <p class="mt-2"><strong>Recommended Crops for Rotation:</strong></p>
+                <ul id="resultRotationCrops" class="list-disc list-inside ml-4 text-green-600">
+                    <!-- Rotation crops will be populated here -->
+                </ul>
+                <p class="mt-2"><strong>Benefits:</strong></p>
+                <ul id="resultRotationBenefits" class="list-disc list-inside ml-4 text-green-600">
+                    <!-- Rotation benefits will be populated here -->
+                </ul>
+                <p class="text-sm text-green-600 mt-2">
+                    This plan aims to improve long-term soil health and optimize nutrient cycling.
+                </p>
+            </div>
+
+            <div class="bg-green-50 p-5 rounded-lg border border-green-200">
+                <h2 class="text-2xl font-bold text-green-700 mb-4">Crop Planning Recommendations</h2>
+                <p><strong>Ideal Soil:</strong> <span id="resultIdealSoil" class="font-semibold"></span></p>
+                <p><strong>Ideal Water Source:</strong> <span id="resultIdealWater" class="font-semibold"></span></p>
+                <p><strong>Ideal Temperature Range:</strong> <span id="resultIdealTemperature" class="font-semibold"></span></p>
+                <p><strong>Optimal Growing Season:</strong> <span id="resultGrowingSeason" class="font-semibold"></span></p>
+                <p><strong>Expected Yield:</strong> <span id="resultExpectedYield" class="font-semibold"></span></p>
+                <p><strong>Required Inputs:</strong> <span id="resultRequiredInputs" class="font-semibold"></span></p>
+            </div>
+            <button onclick="window.location.reload();" class="btn-primary w-full mt-6">Start New Analysis</button>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModalOverlay" class="hidden">
+        <div id="confirmationModal">
+            <button class="close-btn" onclick="document.getElementById('confirmationModalOverlay').style.display='none';">&times;</button>
+            <h3 class="text-2xl font-bold mb-4" id="modalTitle">Submission Summary</h3>
+            <p class="text-lg mb-2" id="modalPredictedLat" style="display: none;">Predicted Latitude: <span class="font-semibold"></span></p>
+            <p class="text-lg mb-4" id="modalPredictedLng" style="display: none;">Predicted Longitude: <span class="font-semibold"></span></p>
+            <p class="text-sm text-green-200" id="modalMessage">
+                Your data has been received. We will process this information to provide tailored recommendations.
+            </p>
+        </div>
+    </div>
+
+    <!-- Map Selection Modal -->
+    <div id="mapSelectionModalOverlay" class="hidden">
+        <div id="mapSelectionModal">
+            <button class="close-btn" onclick="
+                document.getElementById('mapSelectionModalOverlay').style.display='none';
+                // isManualWaterSourceSelectionMode remains true so user can click on map
+                // map.getContainer().style.cursor remains 'crosshair'
+            ">&times;</button>
+            <h3 class="text-2xl font-bold mb-4">Select Water Source on Map</h3>
+            <p class="text-lg mb-4">Click anywhere on the map to select the water source.</p>
+            <p class="text-sm text-green-200">
+                A marker will be placed at your selected location.
+            </p>
+            <button onclick="document.getElementById('mapSelectionModalOverlay').style.display='none';"
+                    class="btn-primary w-full mt-4">Okay</button>
+        </div>
+    </div>
+
+    <!-- Restore ID Modal -->
+    <div id="restoreIdModalOverlay" class="hidden">
+        <div id="restoreIdModal" class="bg-green-700 text-white p-6 rounded-xl shadow-lg w-90 max-w-sm relative text-center">
+            <button class="close-btn" onclick="document.getElementById('restoreIdModalOverlay').style.display='none';">&times;</button>
+            <h3 class="text-2xl font-bold mb-4">Restore Field Data</h3>
+            <p class="text-lg mb-4">Enter your field's Referral ID:</p>
+            <input type="text" id="restoreFieldIdInput" placeholder="e.g., AGRO-ABC12345"
+                   class="w-full rounded-lg border-green-500 focus:ring-green-300 focus:border-green-300 shadow-sm mb-4">
+            <button id="submitRestoreIdBtn" class="btn-primary w-full">Restore Data</button>
+            <p id="restoreStatus" class="text-sm text-green-200 mt-2 text-center"></p>
+        </div>
+    </div>
+
+    <!-- Analysis Loading Screen Overlay -->
+    <div id="analysisOverlay" class="hidden">
+        <div id="analysisScreen">
+            <div class="loader"></div>
+            <h3 class="text-2xl font-bold mt-4">Analyzing Data...</h3>
+            <p class="text-green-200 mt-2">Please wait while we process your field data with satellite insights.</p>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <!-- jsPDF CDN for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase
+        let app;
+        let db;
+        let auth;
+        let userId;
+
+        // Ensure __app_id and __firebase_config are defined in the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        // Initialize firebaseConfig with default empty values for all expected fields
+        let firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            projectId: "agroai-default-project", // Default project ID
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        // Initialize Firebase and authenticate
+        async function initializeFirebase() {
+            try {
+                // Parse __firebase_config if it's defined and not empty, then merge
+                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                    try {
+                        const parsedConfig = JSON.parse(__firebase_config);
+                        // Merge parsed config with defaults, preferring parsed values
+                        firebaseConfig = { ...firebaseConfig, ...parsedConfig };
+                    } catch (e) {
+                        console.error("Error parsing __firebase_config. Using default Firebase configuration. Error:", e);
+                    }
+                }
+
+                // If projectId is still missing after parsing/merging, set a fallback
+                if (!firebaseConfig.projectId) {
+                    firebaseConfig.projectId = 'agroai-default-project';
+                    console.warn("Firebase projectId was not provided in __firebase_config. Using default 'agroai-default-project'.");
+                }
+                
+                // If apiKey is still missing after parsing/merging, set it to empty string.
+                // NOTE: For Firebase SDK's initializeApp, an empty API key might be considered invalid.
+                // The Canvas environment is expected to inject a valid API key when it's an empty string.
+                // If this error persists, it indicates an issue with the Canvas environment's Firebase API key injection.
+                if (!firebaseConfig.apiKey) {
+                    firebaseConfig.apiKey = '';
+                    console.warn("Firebase apiKey was not provided in __firebase_config. Setting to empty string. Canvas is expected to inject the actual key.");
+                }
+
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                userId = auth.currentUser?.uid || crypto.randomUUID();
+                console.log("Firebase initialized. User ID:", userId);
+            } catch (error) {
+                console.error("Error initializing Firebase or authenticating:", error);
+                // Handle error gracefully, e.g., show a message to the user
+            }
+        }
+
+        // Call Firebase initialization when the script loads
+        // initializeFirebase(); // Moved call to window.onload
+
+        // Embedded script.js content (rest of your existing JS)
+        let map;
+        let fieldLocationMarker; // Renamed 'marker' to 'fieldLocationMarker' for clarity
+        let manualWaterSourceMarker; // New marker for manually selected water source
+        let predictedWaterSourceMapMarker; // New marker for predicted water source
+        let referralId = '';
+        let satelliteLayer; // To hold the satellite tile layer
+        let openStreetMapLayer; // To hold the OpenStreetMap tile layer
+        let predictedUnderwaterLayer; // To hold the predicted underwater locations
+        let isSatelliteView = false; // Flag to track current map view
+        let predictedWaterSourceCoords = { lat: null, lng: null }; // Store predicted water source coordinates
+        let manualWaterSourceCoords = { lat: null, lng: null }; // Store manually selected water source coordinates
+        let isManualWaterSourceSelectionMode = false; // New flag for manual selection mode
+        let currentAnalysisData = {}; // Global variable to store the analysis data for PDF generation
+
+        // Function to initialize the map
+        function initMap() {
+            // Changed defaultCoords to [0, 0] and zoom to 2 for a global view
+            const defaultCoords = [0, 0];
+            map = L.map('map').setView(defaultCoords, 2); // Zoom level 2 for world view
+
+            // Initialize OpenStreetMap layer
+            openStreetMapLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Initialize Esri World Imagery (Satellite) layer, not added to map initially
+            satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community'
+            });
+
+            // Initialize predicted underwater locations layer group
+            predictedUnderwaterLayer = L.layerGroup().addTo(map); // Add to map initially, but it will be empty
+
+            // Add event listener for map movement
+            map.on('moveend', function() {
+                if (isSatelliteView) {
+                    addPredictedUnderwaterLocations();
+                }
+            });
+
+            // Add click listener for manual water source selection
+            map.on('click', function(e) {
+                if (isManualWaterSourceSelectionMode) {
+                    selectManualWaterSource(e.latlng.lat, e.latlng.lng);
+                }
+            });
+        }
+
+        // Function to update the map with new coordinates and trigger soil analysis
+        function updateMap(lat, lng) {
+            if (isNaN(lat) || isNaN(lng)) {
+                console.error("Invalid coordinates for map update:", lat, lng);
+                return;
+            }
+
+            const newLatLng = new L.LatLng(lat, lng);
+            map.setView(newLatLng, 15); // Zoom in to a closer level
+
+            if (fieldLocationMarker) {
+                fieldLocationMarker.setLatLng(newLatLng);
+            } else {
+                fieldLocationMarker = L.marker(newLatLng).addTo(map);
+            }
+            fieldLocationMarker.bindPopup(`Field Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`).openPopup();
+
+            // Trigger soil type determination for the new location
+            determineSoilType(lat, lng);
+            // Trigger water source suitability determination for the new location
+            determinePredictedWaterSourceSuitability(lat, lng);
+        }
+
+        // Function to get GPS location
+        function getGpsLocation() {
+            const statusDiv = document.getElementById('locationStatus');
+            statusDiv.textContent = 'Getting your location...';
+            statusDiv.className = 'text-sm text-green-600 mt-2 text-center';
+
+            // Hide manual coordinate inputs if visible
+            document.getElementById('manualCoordsInput').classList.add('hidden');
+
+            // Disable manual water source selection mode
+            isManualWaterSourceSelectionMode = false;
+            map.getContainer().style.cursor = ''; // Reset cursor
+            document.getElementById('mapSelectionModalOverlay').style.display = 'none'; // Hide map selection modal
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        document.getElementById('latitude').value = lat.toFixed(6);
+                        document.getElementById('longitude').value = lng.toFixed(6);
+                        updateMap(lat, lng); // This will now also determine soil type and water suitability
+                        statusDiv.textContent = 'Location found successfully!';
+                        statusDiv.className = 'text-sm text-green-500 mt-2 text-center'; /* Brighter green for success */
+                        generateReferralId(); // Generate ID once location is set
+                    },
+                    (error) => {
+                        let errorMessage = 'Error getting location.';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = "Location access denied. Please enable location services in your browser settings.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = "Location information is unavailable.";
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = "The request to get user location timed out.";
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                errorMessage = "An unknown error occurred.";
+                                break;
+                        }
+                        statusDiv.textContent = errorMessage;
+                        statusDiv.className = 'text-sm text-red-500 mt-2 text-center'; /* Brighter red for error */
+                        console.error("Geolocation Error:", error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                statusDiv.textContent = 'Geolocation is not supported by your browser.';
+                statusDiv.className = 'text-sm text-red-500 mt-2 text-center'; /* Brighter red for error */
+            }
+        }
+
+        // Function to show/hide manual coordinate input fields
+        function showManualCoords() {
+            const manualCoordsInput = document.getElementById('manualCoordsInput');
+            if (manualCoordsInput.classList.contains('hidden')) {
+                manualCoordsInput.classList.remove('hidden');
+                document.getElementById('locationStatus').textContent = ''; // Clear status
+            } else {
+                manualCoordsInput.classList.add('hidden');
+            }
+            // Disable manual water source selection mode
+            isManualWaterSourceSelectionMode = false;
+            map.getContainer().style.cursor = ''; // Reset cursor
+            document.getElementById('mapSelectionModalOverlay').style.display = 'none'; // Hide map selection modal
+        }
+
+        // Function to apply manual coordinates
+        function submitManualCoords() {
+            const lat = parseFloat(document.getElementById('latitude').value);
+            const lng = parseFloat(document.getElementById('longitude').value);
+            const statusDiv = document.getElementById('locationStatus');
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                updateMap(lat, lng); // This will now also determine soil type and water suitability
+                statusDiv.textContent = 'Manual coordinates applied!';
+                statusDiv.className = 'text-sm text-green-500 mt-2 text-center'; /* Brighter green for success */
+                generateReferralId(); // Generate ID once location is set
+            } else {
+                statusDiv.textContent = 'Please enter valid latitude and longitude.';
+                statusDiv.className = 'text-sm text-red-500 mt-2 text-center'; /* Brighter red for error */
+            }
+            // Disable manual water source selection mode
+            isManualWaterSourceSelectionMode = false;
+            map.getContainer().style.cursor = ''; // Reset cursor
+            document.getElementById('mapSelectionModalOverlay').style.display = 'none'; // Hide map selection modal
+        }
+
+        // Function to search manual location using Nominatim (OpenStreetMap's geocoding service)
+        async function searchManualLocation() {
+            const locationName = document.getElementById('manualLocation').value;
+            const statusDiv = document.getElementById('locationStatus');
+            statusDiv.textContent = 'Searching for location...';
+            statusDiv.className = 'text-sm text-green-600 mt-2 text-center';
+
+            if (!locationName) {
+                statusDiv.textContent = 'Please enter a location name.';
+                statusDiv.className = 'text-sm text-red-500 mt-2 text-center'; /* Brighter red for error */
+                return;
+            }
+
+            // Disable manual water source selection mode
+            isManualWaterSourceSelectionMode = false;
+            map.getContainer().style.cursor = ''; // Reset cursor
+            document.getElementById('mapSelectionModalOverlay').style.display = 'none'; // Hide map selection modal
+
+            // Nominatim API for geocoding
+            const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&limit=1`;
+
+            try {
+                const response = await fetch(nominatimUrl);
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lng = parseFloat(data[0].lon);
+                    document.getElementById('latitude').value = lat.toFixed(6);
+                    document.getElementById('longitude').value = lng.toFixed(6);
+                    updateMap(lat, lng); // This will now also determine soil type and water suitability
+                    statusDiv.textContent = `Location found: ${data[0].display_name}`;
+                    statusDiv.className = 'text-sm text-green-500 mt-2 text-center'; /* Brighter green for success */
+                    generateReferralId();
+                } else {
+                    statusDiv.textContent = 'Location not found. Please try a different name.';
+                    statusDiv.className = 'text-sm text-red-500 mt-2 text-center'; /* Brighter red for error */
+                }
+            } catch (error) {
+                console.error("Error searching location:", error);
+                statusDiv.textContent = 'Error searching location. Please try again.';
+                statusDiv.className = 'text-sm text-red-500 mt-2 text-center'; /* Brighter red for error */
+            }
+        }
+
+        // Function to generate a unique referral ID
+        function generateReferralId() {
+            referralId = 'AGRO-' + crypto.randomUUID().substring(0, 8).toUpperCase();
+            document.getElementById('referralIdDisplay').textContent = referralId;
+            document.getElementById('copyStatus').textContent = ''; // Clear copy status
+        }
+
+        // Function to copy referral ID to clipboard
+        function copyReferralId() {
+            const idToCopy = document.getElementById('referralIdDisplay').textContent;
+            const copyStatusDiv = document.getElementById('copyStatus');
+
+            // Use document.execCommand('copy') for better compatibility in iframes
+            const tempInput = document.createElement('textarea');
+            tempInput.value = idToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+                copyStatusDiv.textContent = 'Referral ID copied to clipboard!';
+                copyStatusDiv.className = 'text-sm text-green-500 mt-2 text-center'; /* Brighter green for success */
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                copyStatusDiv.textContent = 'Failed to copy ID. Please copy manually.';
+                copyStatusDiv.className = 'text-sm text-red-500 mt-2 text-center'; /* Brighter red for error */
+            } finally {
+                document.body.removeChild(tempInput);
+            }
+        }
+
+        // Function to add simulated predicted underwater locations
+        function addPredictedUnderwaterLocations() {
+            // Clear existing predicted locations
+            predictedUnderwaterLayer.clearLayers();
+
+            // Get current map bounds to generate points within the visible area
+            const bounds = map.getBounds();
+            const southWest = bounds.getSouthWest();
+            const northEast = bounds.getNorthEast();
+
+            // Define a few "hotspot" centers for more clustered data
+            const hotspots = [
+                // Example hotspots (you can adjust these or add more)
+                [southWest.lat + (northEast.lat - southWest.lat) * 0.2, southWest.lng + (northEast.lng - southWest.lng) * 0.3],
+                [southWest.lat + (northEast.lat - southWest.lat) * 0.7, southWest.lng + (northEast.lng - southWest.lng) * 0.6],
+                [southWest.lat + (northEast.lat - southWest.lat) * 0.4, southWest.lng + (northEast.lng - southWest.lng) * 0.8]
+            ];
+
+            const pointsPerHotspot = 10; // Number of points around each hotspot
+            const randomPoints = 20; // Additional random points for broader coverage
+            const spread = 0.05; // Controls how spread out points are around a hotspot
+
+            // Get the info window elements
+            const infoWindow = document.getElementById('predictionInfoWindow');
+            const infoType = document.getElementById('infoType');
+            const infoVolume = document.getElementById('infoVolume');
+            const infoQuality = document.getElementById('infoQuality');
+            const infoConfidence = document.getElementById('infoConfidence');
+            const infoDepth = document.getElementById('infoDepth');
+            const infoFlowRate = document.getElementById('infoFlowRate');
+            const infoTimeExtract = document.getElementById('infoTimeExtract');
+
+
+            // Function to display the info window with detailed data
+            function showInfoWindow(data) {
+                infoType.textContent = data.type;
+                infoVolume.textContent = data.volume;
+                infoQuality.textContent = data.quality;
+                infoConfidence.textContent = data.confidence;
+                infoDepth.textContent = data.depth;
+                infoFlowRate.textContent = data.flowRate;
+                infoTimeExtract.textContent = data.timeToExtract;
+                infoWindow.style.display = 'flex'; // Use flex to enable column layout
+            }
+
+            // Helper function to generate random data for a prediction
+            function generatePredictionData() {
+                const types = ["Freshwater Aquifer", "Brackish Water Reservoir", "Mineral-Rich Source", "Deep Underground Lake"];
+                const qualities = ["High", "Medium", "Low"];
+                const volumes = [`${(Math.random() * 10000 + 1000).toFixed(0)} cubic meters`, `${(Math.random() * 50000 + 5000).toFixed(0)} liters`];
+                const depths = [`${(Math.random() * 200 + 20).toFixed(0)} meters`, `${(Math.random() * 500 + 50).toFixed(0)} feet`];
+                const flowRates = [`${(Math.random() * 500 + 50).toFixed(0)} liters/hour`, `${(Math.random() * 10 + 1).toFixed(1)} m³/day`];
+                const timeToExtract = [`${(Math.random() * 60 + 10).toFixed(0)} days`, `${(Math.random() * 12 + 1).toFixed(0)} weeks`];
+
+                return {
+                    type: types[Math.floor(Math.random() * types.length)],
+                    volume: volumes[Math.floor(Math.random() * volumes.length)],
+                    quality: qualities[Math.floor(Math.random() * qualities.length)],
+                    confidence: `${(Math.random() * 30 + 70).toFixed(0)}%`, // 70-99%
+                    depth: depths[Math.floor(Math.random() * depths.length)],
+                    flowRate: flowRates[Math.floor(Math.random() * flowRates.length)],
+                    timeToExtract: timeToExtract[Math.floor(Math.random() * timeToExtract.length)]
+                };
+            }
+
+            // Generate points around hotspots
+            hotspots.forEach(hotspot => {
+                for (let i = 0; i < pointsPerHotspot; i++) {
+                    const lat = hotspot[0] + (Math.random() - 0.5) * spread;
+                    const lng = hotspot[1] + (Math.random() - 0.5) * spread;
+
+                    // Ensure points are within current map bounds
+                    if (lat >= southWest.lat && lat <= northEast.lat && lng >= southWest.lng && lng <= northEast.lng) {
+                        const predictionData = generatePredictionData();
+                        const circle = L.circleMarker([lat, lng], {
+                            color: '#00FFFF', // Cyan color for water
+                            fillColor: '#00FFFF',
+                            fillOpacity: 0.5,
+                            radius: 8
+                        });
+
+                        // Attach click event listener to show the info window
+                        circle.on('click', function(e) {
+                            showInfoWindow(predictionData);
+                        });
+
+                        predictedUnderwaterLayer.addLayer(circle);
+                    }
+                }
+            });
+
+            // Generate additional random points for broader distribution
+            for (let i = 0; i < randomPoints; i++) {
+                const lat = southWest.lat + (Math.random() * (northEast.lat - southWest.lat));
+                const lng = southWest.lng + (Math.random() * (northEast.lng - southWest.lng));
+
+                const predictionData = generatePredictionData();
+                const circle = L.circleMarker([lat, lng], {
+                    color: '#00FFFF', // Cyan color for water
+                    fillColor: '#00FFFF',
+                    fillOpacity: 0.5,
+                    radius: 8
+                });
+
+                // Attach click event listener to show the info window
+                circle.on('click', function(e) {
+                    showInfoWindow(predictionData);
+                });
+
+                predictedUnderwaterLayer.addLayer(circle);
+            }
+        }
+
+        // Function to determine soil type (simulated)
+        function determineSoilType(lat, lng) {
+            const soilTypeDisplay = document.getElementById('soilTypeDisplay');
+            const soilTypes = ["Loamy", "Sandy", "Clayey", "Silty", "Peaty", "Chalky"];
+            const randomSoilType = soilTypes[Math.floor(Math.random() * soilTypes.length)];
+            soilTypeDisplay.textContent = randomSoilType;
+        }
+
+        // Function to determine closest water source and its suitability (simulated)
+        function determinePredictedWaterSourceSuitability(lat, lng) {
+            const predictedWaterSourceTypeDisplay = document.getElementById('predictedWaterSourceType');
+            const predictedWaterSuitabilityDisplay = document.getElementById('predictedWaterSuitability');
+
+            const waterSourceTypes = ["River", "Lake", "Underground Aquifer", "Spring"];
+            const suitabilityOptions = ["Highly Suitable", "Moderately Suitable", "Not Recommended"];
+
+            const randomSourceType = waterSourceTypes[Math.floor(Math.random() * waterSourceTypes.length)];
+            const randomSuitability = suitabilityOptions[Math.floor(Math.random() * suitabilityOptions.length)];
+
+            predictedWaterSourceTypeDisplay.textContent = randomSourceType;
+            predictedWaterSuitabilityDisplay.textContent = randomSuitability;
+
+            // Simulate coordinates for the closest water source (can be near the current map center)
+            predictedWaterSourceCoords.lat = lat + (Math.random() - 0.5) * 0.1; // Small offset
+            predictedWaterSourceCoords.lng = lng + (Math.random() - 0.5) * 0.1; // Small offset
+        }
+
+        // Function to navigate to the predicted water source on the map
+        function goToWaterSourceLocation() {
+            const modalOverlay = document.getElementById('confirmationModalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalPredictedLat = document.getElementById('modalPredictedLat');
+            const modalPredictedLng = document.getElementById('modalPredictedLng');
+
+            // Hide these by default
+            modalPredictedLat.style.display = 'none';
+            modalPredictedLng.style.display = 'none';
+
+            if (predictedWaterSourceCoords.lat !== null && predictedWaterSourceCoords.lng !== null) {
+                map.setView([predictedWaterSourceCoords.lat, predictedWaterSourceCoords.lng], 15); // Zoom in
+
+                // Define a custom icon for the predicted water source marker (e.g., green droplet)
+                const predictedWaterIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: '<i class="fa-solid fa-droplet text-green-400 text-2xl"></i>', // Green water droplet icon
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 30]
+                });
+
+                if (predictedWaterSourceMapMarker) {
+                    predictedWaterSourceMapMarker.setLatLng([predictedWaterSourceCoords.lat, predictedWaterSourceCoords.lng]);
+                } else {
+                    predictedWaterSourceMapMarker = L.marker([predictedWaterSourceCoords.lat, predictedWaterSourceCoords.lng], {
+                        icon: predictedWaterIcon
+                    }).addTo(map);
+                }
+                predictedWaterSourceMapMarker.bindPopup("Predicted Water Source").openPopup();
+
+                // If successful, ensure modal is hidden
+                modalOverlay.style.display = 'none';
+
+            } else {
+                modalTitle.textContent = "Predicted Water Source Information";
+                modalMessage.textContent = "The predicted water source will be determined after you select your agricultural field location on the map (using GPS, manual coordinates, or search).";
+
+                // Show and populate the latitude and longitude fields as N/A
+                modalPredictedLat.style.display = 'block';
+                modalPredictedLng.style.display = 'block';
+                modalPredictedLat.querySelector('span').textContent = 'N/A';
+                modalPredictedLng.querySelector('span').textContent = 'N/A';
+
+                modalOverlay.style.display = 'flex';
+            }
+        }
+
+        // Function to enable manual selection of water source
+        function enableManualWaterSourceSelection() {
+            isManualWaterSourceSelectionMode = true;
+            map.getContainer().style.cursor = 'crosshair'; // Change cursor to indicate selection mode
+            
+            // Show the specific map selection modal
+            document.getElementById('mapSelectionModalOverlay').style.display = 'flex';
+        }
+
+        // Function to handle manual water source selection on map click
+        function selectManualWaterSource(lat, lng) {
+            isManualWaterSourceSelectionMode = false; // Exit manual selection mode
+            map.getContainer().style.cursor = ''; // Reset cursor
+
+            manualWaterSourceCoords.lat = lat;
+            manualWaterSourceCoords.lng = lng;
+
+            // Update the display with the manually selected source type and suitability (simulated)
+            const manualWaterSourceTypeDisplay = document.getElementById('manualWaterSourceType');
+            const manualWaterSuitabilityDisplay = document.getElementById('manualWaterSuitability');
+            const goToManualWaterSourceBtn = document.getElementById('goToManualWaterSourceBtn');
+
+            const waterSourceTypes = ["Manually Selected Source (River)", "Manually Selected Source (Lake)", "Manually Selected Source (Well)"];
+            const suitabilityOptions = ["Highly Suitable", "Moderately Suitable", "Not Recommended"];
+
+            manualWaterSourceTypeDisplay.textContent = waterSourceTypes[Math.floor(Math.random() * waterSourceTypes.length)];
+            manualWaterSuitabilityDisplay.textContent = suitabilityOptions[Math.floor(Math.random() * suitabilityOptions.length)];
+            goToManualWaterSourceBtn.style.display = 'flex'; // Show the "View Manually Selected Source" button
+
+            // Add or update the manual water source marker
+            if (manualWaterSourceMarker) {
+                manualWaterSourceMarker.setLatLng([lat, lng]);
+            } else {
+                manualWaterSourceMarker = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        className: 'custom-div-icon',
+                        html: '<i class="fa-solid fa-droplet text-green-400 text-2xl"></i>', // Green water droplet icon
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 30]
+                    })
+                }).addTo(map);
+            }
+            manualWaterSourceMarker.bindPopup("Manually Selected Water Source").openPopup();
+
+            // Hide the map selection modal
+            document.getElementById('mapSelectionModalOverlay').style.display = 'none';
+        }
+
+        // Function to navigate to the manually selected water source on the map
+        function goToManualWaterSourceLocation() {
+            if (manualWaterSourceCoords.lat !== null && manualWaterSourceCoords.lng !== null) {
+                map.setView([manualWaterSourceCoords.lat, manualWaterSourceCoords.lng], 15); // Zoom in
+                if (manualWaterSourceMarker) { // Use manualWaterSourceMarker here
+                    manualWaterSourceMarker.setLatLng([manualWaterSourceCoords.lat, manualWaterSourceCoords.lng]);
+                } else {
+                    manualWaterSourceMarker = L.marker([manualWaterSourceCoords.lat, manualWaterSourceCoords.lng]).addTo(map);
+                }
+                manualWaterSourceMarker.bindPopup("Manually Selected Water Source").openPopup();
+            } else {
+                const modalOverlay = document.getElementById('confirmationModalOverlay');
+                const modalTitle = document.querySelector('#confirmationModal h3');
+                const modalMessage = document.querySelector('#confirmationModal p.text-sm');
+                // Ensure these are hidden if they were shown by another function
+                document.getElementById('modalPredictedLat').style.display = 'none';
+                document.getElementById('modalPredictedLng').style.display = 'none';
+
+                modalTitle.textContent = "Location Error";
+                modalMessage.textContent = "No manual water source selected yet.";
+                modalOverlay.style.display = 'flex';
+            }
+        }
+
+        // Function to toggle between OpenStreetMap and Satellite view, and show/hide predictions
+        function toggleSatelliteView() {
+            if (isSatelliteView) {
+                // Switch to OpenStreetMap view
+                map.removeLayer(satelliteLayer);
+                map.addLayer(openStreetMapLayer);
+                predictedUnderwaterLayer.clearLayers(); // Hide predictions when not in satellite view
+                document.getElementById('predictionInfoWindow').style.display = 'none'; // Hide info window
+                isSatelliteView = false;
+            } else {
+                // Switch to Satellite view
+                map.removeLayer(openStreetMapLayer);
+                map.addLayer(satelliteLayer);
+                addPredictedUnderwaterLocations(); // Add predictions when in satellite view
+                isSatelliteView = true;
+            }
+            // Disable manual water source selection mode when toggling map view
+            isManualWaterSourceSelectionMode = false;
+            map.getContainer().style.cursor = ''; // Reset cursor
+            document.getElementById('mapSelectionModalOverlay').style.display = 'none'; // Hide map selection modal
+        }
+
+        // Function to determine crop suitability (simulated - no API call)
+        async function determineCropSuitability(cropName, soilType, waterSourceSuitability, satelliteData) {
+            if (!cropName) {
+                return { suitability: "N/A", reasons: ["Please enter a desired crop."] };
+            }
+
+            let suitability = "Uncertain";
+            let reasons = [];
+
+            // Simple simulated logic for suitability
+            if (soilType === "Loamy" && waterSourceSuitability === "Highly Suitable" && parseFloat(satelliteData.temperature) > 15 && parseFloat(satelliteData.temperature) < 30) {
+                suitability = "Highly Suitable";
+                reasons.push("Optimal soil type and water source, with favorable temperature range.");
+            } else if (soilType === "Sandy" && waterSourceSuitability === "Moderately Suitable") {
+                suitability = "Moderately Suitable";
+                reasons.push("Sandy soil may require more water retention strategies, but water source is adequate.");
+            } else {
+                suitability = "Not Recommended";
+                reasons.push("Conditions are not ideal for this crop based on current data.");
+            }
+
+            // Add some random variation for demonstration
+            if (Math.random() < 0.2) { // 20% chance to slightly alter outcome
+                if (suitability === "Highly Suitable") suitability = "Moderately Suitable";
+                else if (suitability === "Moderately Suitable") suitability = "Highly Suitable";
+            }
+            if (reasons.length === 0) {
+                reasons.push("General assessment based on simulated data.");
+            }
+
+            return { suitability: suitability, reasons: reasons };
+        }
+
+        // Function to determine the best crop recommendation (simulated - no API call)
+        async function determineBestCropRecommendation(fieldData, desiredCropSuitability) {
+            let recommendedCrop = "General Crop";
+            let reasons = [];
+
+            // Prioritize desired crop if it's suitable
+            if (fieldData.desiredCrop && desiredCropSuitability.suitability !== "Not Recommended") {
+                recommendedCrop = fieldData.desiredCrop;
+                reasons.push(`Your desired crop (${fieldData.desiredCrop}) is ${desiredCropSuitability.suitability.toLowerCase()} for this field.`);
+                reasons.push(...desiredCropSuitability.reasons); // Add reasons from suitability analysis
+            } else if (fieldData.desiredCrop && desiredCropSuitability.suitability === "Not Recommended") {
+                recommendedCrop = fieldData.desiredCrop; // Still set it as desired crop but explain why it's not recommended
+                reasons.push(`Your desired crop (${fieldData.desiredCrop}) is ${desiredCropSuitability.suitability.toLowerCase()} for this field due to:`);
+                reasons.push(...desiredCropSuitability.reasons);
+                reasons.push("Considering other options might yield better results.");
+            }
+            
+            // Fallback to general recommendations if desired crop is not suitable or not provided
+            if (recommendedCrop === "General Crop" || (fieldData.desiredCrop && desiredCropSuitability.suitability === "Not Recommended")) {
+                if (fieldData.soilType === "Loamy" && fieldData.predictedWaterSource.suitability === "Highly Suitable") {
+                    recommendedCrop = "Wheat";
+                    reasons.push("Loamy soil and highly suitable water source are excellent for wheat.");
+                    reasons.push("Wheat is a resilient crop that adapts well to various climates.");
+                } else if (fieldData.soilType === "Clayey" && fieldData.satelliteData.rainfallPrediction.includes("high")) {
+                    recommendedCrop = "Rice";
+                    reasons.push("Clayey soil and high rainfall are ideal conditions for rice cultivation.");
+                    reasons.push("Rice thrives in water-retentive soils.");
+                } else if (fieldData.budget && parseFloat(fieldData.budget) > 10000) {
+                    recommendedCrop = "Tomatoes";
+                    reasons.push("Sufficient budget allows for investment in irrigation and pest control for tomatoes.");
+                    reasons.push("Tomatoes offer high market value with proper management.");
+                } else {
+                    recommendedCrop = "Corn";
+                    reasons.push("Corn is a versatile crop suitable for a range of soil types and moderate water availability.");
+                    reasons.push("It has a good market demand and is relatively easy to cultivate.");
+                }
+            }
+
+
+            // Add some random flavor text
+            if (Math.random() < 0.3) {
+                reasons.push("Further analysis with real-time data could refine this recommendation.");
+            }
+
+            return { recommendedCrop: recommendedCrop, reasons: reasons };
+        }
+
+        // Function to simulate climate risk alerts
+        function simulateClimateRisk(desiredCrop, rainfallPrediction, soilMoistureIndex, seasonalForecast, elevation, slopeData) {
+            let floodRisk = "Low";
+            let droughtRisk = "Low";
+
+            // Simple logic for flood risk
+            // Convert rainfallPrediction to a number (assuming "XX.X mm/month")
+            const rainfallValue = parseFloat(rainfallPrediction.split(' ')[0]);
+
+            if (rainfallValue > 80 || seasonalForecast.includes("Wet Season")) {
+                floodRisk = "Medium";
+            }
+            if (rainfallValue > 150 || (seasonalForecast.includes("Wet Season") && parseFloat(slopeData) < 2)) {
+                floodRisk = "High";
+            }
+
+            // Simple logic for drought risk
+            const soilMoistureValue = parseFloat(soilMoistureIndex);
+            if (soilMoistureValue < 0.3 || seasonalForecast.includes("Dry Spell")) {
+                droughtRisk = "Medium";
+            }
+            if (soilMoistureValue < 0.15 || (seasonalForecast.includes("Dry Spell") && desiredCrop.toLowerCase().includes("wheat"))) { // Wheat can be sensitive to drought
+                droughtRisk = "High";
+            }
+
+            return { floodRisk, droughtRisk };
+        }
+
+        // Function to simulate crop rotation planning
+        function simulateCropRotationPlanner(desiredCrop, soilType) {
+            let rotationStrategy = "Standard 3-Year Rotation";
+            let recommendedCrops = [];
+            let benefits = [];
+
+            if (desiredCrop.toLowerCase().includes("wheat")) {
+                rotationStrategy = "Wheat-Legume-Fallow Rotation";
+                recommendedCrops = ["Wheat", "Alfalfa (Legume)", "Corn"];
+                benefits = [
+                    "Nitrogen fixation by legumes improves soil fertility.",
+                    "Disrupts pest and disease cycles specific to wheat.",
+                    "Improves soil structure and organic matter."
+                ];
+            } else if (desiredCrop.toLowerCase().includes("corn")) {
+                rotationStrategy = "Corn-Soybean-Wheat Rotation";
+                recommendedCrops = ["Corn", "Soybean", "Wheat"]; // Corrected typo here
+                benefits = [
+                    "Soybeans fix nitrogen, reducing fertilizer needs for corn.",
+                    "Diversifies root systems, improving soil aggregation.",
+                    "Reduces soil erosion and nutrient runoff."
+                ];
+            } else if (desiredCrop.toLowerCase().includes("tomatoes")) {
+                rotationStrategy = "Vegetable-Cover Crop Rotation";
+                recommendedCrops = ["Tomatoes", "Cabbage", "Clover (Cover Crop)"];
+                benefits = [
+                    "Breaks disease cycles common to solanaceous crops.",
+                    "Cover crops suppress weeds and prevent nutrient leaching.",
+                    "Enhances soil biodiversity."
+                ];
+            } else {
+                rotationStrategy = "General Diversified Rotation";
+                recommendedCrops = ["Legumes (e.g., Beans)", "Root Vegetables (e.g., Carrots)", "Leafy Greens (e.g., Spinach)"];
+                benefits = [
+                    "Maintains soil fertility through diverse nutrient demands.",
+                    "Reduces reliance on a single crop, mitigating risk.",
+                    "Promotes a healthy soil microbiome."
+                ];
+            }
+
+            if (soilType === "Sandy") {
+                benefits.push("Helps increase organic matter and water retention in sandy soils.");
+            } else if (soilType === "Clayey") {
+                benefits.push("Improves drainage and prevents compaction in clayey soils.");
+            }
+
+            return { rotationStrategy, recommendedCrops, benefits };
+        }
+
+
+        // Function to populate and show the analysis results page
+        function showAnalysisResults(data) {
+            currentAnalysisData = data; // Store the data globally for PDF generation
+            document.getElementById('main-app-content').classList.add('hidden'); // Hide main form
+            document.getElementById('analysisResultsPage').classList.remove('hidden'); // Show results page
+
+            document.getElementById('resultReferralId').textContent = data.referralId;
+            document.getElementById('resultFieldLocation').textContent = data.fieldLocation ? `${data.fieldLocation.lat.toFixed(4)}, ${data.fieldLocation.lng.toFixed(4)}` : 'N/A';
+            document.getElementById('resultSoilType').textContent = data.soilType;
+            document.getElementById('resultPredictedWaterSource').textContent = `${data.predictedWaterSource.type} (${data.predictedWaterSource.suitability})`;
+            document.getElementById('resultManualWaterSource').textContent = data.manualWaterSource ? `${data.manualWaterSource.type} (${data.manualWaterSource.suitability})` : 'N/A';
+            document.getElementById('resultBudget').textContent = data.budget ? `$${data.budget}` : 'N/A';
+            document.getElementById('resultTools').textContent = data.availableTools ? data.availableTools : 'N/A';
+            document.getElementById('resultDesiredCrop').textContent = data.desiredCrop || 'N/A'; // Display desired crop
+
+            document.getElementById('resultRainfall').textContent = data.satelliteData.rainfallPrediction;
+            document.getElementById('resultSoilMoisture').textContent = data.satelliteData.soilMoistureIndex;
+            document.getElementById('resultTemperature').textContent = data.satelliteData.temperature;
+            document.getElementById('resultSeasonalForecast').textContent = data.satelliteData.seasonalForecast;
+            document.getElementById('resultElevation').textContent = data.satelliteData.landElevation;
+            document.getElementById('resultSlope').textContent = data.satelliteData.slopeData;
+
+            // Display Climate Risk Alerts
+            document.getElementById('resultFloodRisk').textContent = data.climateRisks.floodRisk;
+            document.getElementById('resultDroughtRisk').textContent = data.climateRisks.droughtRisk;
+
+            // Display desired crop suitability results
+            document.getElementById('resultCropName').textContent = data.desiredCrop || 'Selected Crop';
+            document.getElementById('resultCropSuitability').textContent = data.cropSuitability.suitability;
+            const reasonsList = document.getElementById('resultCropSuitabilityReasons');
+            reasonsList.innerHTML = ''; // Clear previous reasons
+            if (data.cropSuitability.reasons && data.cropSuitability.reasons.length > 0) {
+                data.cropSuitability.reasons.forEach(reason => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = reason;
+                    reasonsList.appendChild(listItem);
+                });
+            } else {
+                const listItem = document.createElement('li');
+                listItem.textContent = "No specific reasons provided.";
+                reasonsList.appendChild(listItem);
+            }
+
+            // Display best crop recommendation results
+            document.getElementById('resultBestCropRecommendation').textContent = data.bestCropRecommendation.recommendedCrop;
+            const bestCropReasonsList = document.getElementById('resultBestCropRecommendationReasons');
+            bestCropReasonsList.innerHTML = ''; // Clear previous reasons
+            if (data.bestCropRecommendation.reasons && data.bestCropRecommendation.reasons.length > 0) {
+                data.bestCropRecommendation.reasons.forEach(reason => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = reason;
+                    bestCropReasonsList.appendChild(listItem);
+                });
+            } else {
+                const listItem = document.createElement('li');
+                listItem.textContent = "No specific reasons provided for best crop recommendation.";
+                bestCropReasonsList.appendChild(listItem);
+            }
+
+            // Display Crop Rotation Planner results
+            document.getElementById('resultRotationStrategy').textContent = data.cropRotationPlanner.rotationStrategy;
+            const rotationCropsList = document.getElementById('resultRotationCrops');
+            rotationCropsList.innerHTML = '';
+            if (data.cropRotationPlanner.recommendedCrops && data.cropRotationPlanner.recommendedCrops.length > 0) {
+                data.cropRotationPlanner.recommendedCrops.forEach(crop => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = crop;
+                    rotationCropsList.appendChild(listItem);
+                });
+            } else {
+                const listItem = document.createElement('li');
+                listItem.textContent = "No specific crops recommended for rotation.";
+                rotationCropsList.appendChild(listItem);
+            }
+            const rotationBenefitsList = document.getElementById('resultRotationBenefits');
+            rotationBenefitsList.innerHTML = '';
+            if (data.cropRotationPlanner.benefits && data.cropRotationPlanner.benefits.length > 0) {
+                data.cropRotationPlanner.benefits.forEach(benefit => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = benefit;
+                    rotationBenefitsList.appendChild(listItem);
+                });
+            } else {
+                const listItem = document.createElement('li');
+                listItem.textContent = "No specific benefits listed.";
+                rotationBenefitsList.appendChild(listItem);
+            }
+
+
+            document.getElementById('resultIdealSoil').textContent = data.recommendations.idealSoil;
+            document.getElementById('resultIdealWater').textContent = data.recommendations.idealWater;
+            document.getElementById('resultIdealTemperature').textContent = data.recommendations.idealTemperature;
+            document.getElementById('resultGrowingSeason').textContent = data.recommendations.growingSeason;
+            document.getElementById('resultExpectedYield').textContent = data.recommendations.expectedYield;
+            document.getElementById('resultRequiredInputs').textContent = data.recommendations.requiredInputs;
+        }
+
+        // Function to generate and download the PDF
+        function downloadAnalysisPdf() {
+            // Ensure jsPDF is loaded
+            if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+                console.error("jsPDF library not loaded. Cannot generate PDF.");
+                // Potentially show a user-friendly message
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            let yOffset = 10;
+            const margin = 10;
+            const lineHeight = 7;
+            const sectionSpacing = 10;
+
+            doc.setFontSize(18);
+            doc.text("Farm-IQ: Field Analysis Report", margin, yOffset);
+            yOffset += sectionSpacing;
+
+            doc.setFontSize(14);
+            doc.text("Field Summary", margin, yOffset);
+            yOffset += lineHeight;
+            doc.setFontSize(12);
+            doc.text(`Referral ID: ${currentAnalysisData.referralId || 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Field Location: ${currentAnalysisData.fieldLocation ? `${currentAnalysisData.fieldLocation.lat.toFixed(4)}, ${currentAnalysisData.fieldLocation.lng.toFixed(4)}` : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Detected Soil Type: ${currentAnalysisData.soilType || 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Predicted Water Source: ${currentAnalysisData.predictedWaterSource ? `${currentAnalysisData.predictedWaterSource.type} (${currentAnalysisData.predictedWaterSource.suitability})` : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Manual Water Source: ${currentAnalysisData.manualWaterSource ? `${currentAnalysisData.manualWaterSource.type} (${currentAnalysisData.manualWaterSource.suitability})` : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Estimated Budget: ${currentAnalysisData.budget ? `$${currentAnalysisData.budget}` : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Available Tools: ${currentAnalysisData.availableTools || 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Desired Crop: ${currentAnalysisData.desiredCrop || 'N/A'}`, margin, yOffset);
+            yOffset += sectionSpacing;
+
+            doc.setFontSize(14);
+            doc.text("Satellite Data & Forecasts", margin, yOffset);
+            yOffset += lineHeight;
+            doc.setFontSize(12);
+            doc.text(`Rainfall Prediction: ${currentAnalysisData.satelliteData ? currentAnalysisData.satelliteData.rainfallPrediction : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Soil Moisture Index: ${currentAnalysisData.satelliteData ? currentAnalysisData.satelliteData.soilMoistureIndex : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Temperature: ${currentAnalysisData.satelliteData ? currentAnalysisData.satelliteData.temperature : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Seasonal Forecast: ${currentAnalysisData.satelliteData ? currentAnalysisData.satelliteData.seasonalForecast : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Land Elevation: ${currentAnalysisData.satelliteData ? currentAnalysisData.satelliteData.landElevation : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Slope Data: ${currentAnalysisData.satelliteData ? currentAnalysisData.satelliteData.slopeData : 'N/A'}`, margin, yOffset);
+            yOffset += sectionSpacing;
+
+            // Add Climate Risk Alerts to PDF
+            doc.setFontSize(14);
+            doc.text("Climate Risk Alerts", margin, yOffset);
+            yOffset += lineHeight;
+            doc.setFontSize(12);
+            doc.text(`Flood Risk: ${currentAnalysisData.climateRisks ? currentAnalysisData.climateRisks.floodRisk : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Drought Risk: ${currentAnalysisData.climateRisks ? currentAnalysisData.climateRisks.droughtRisk : 'N/A'}`, margin, yOffset);
+            yOffset += sectionSpacing;
+
+            doc.setFontSize(14);
+            doc.text("Desired Crop Suitability Analysis", margin, yOffset);
+            yOffset += lineHeight;
+            doc.setFontSize(12);
+            doc.text(`Possibility of Growing ${currentAnalysisData.desiredCrop || 'Selected Crop'}: ${currentAnalysisData.cropSuitability ? currentAnalysisData.cropSuitability.suitability : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text("Reasons:", margin, yOffset);
+            yOffset += lineHeight;
+            if (currentAnalysisData.cropSuitability && currentAnalysisData.cropSuitability.reasons && currentAnalysisData.cropSuitability.reasons.length > 0) {
+                currentAnalysisData.cropSuitability.reasons.forEach(reason => {
+                    doc.text(`- ${reason}`, margin + 5, yOffset);
+                    yOffset += lineHeight;
+                });
+            } else {
+                doc.text("- No specific reasons provided.", margin + 5, yOffset);
+                yOffset += lineHeight;
+            }
+            yOffset += sectionSpacing;
+
+            doc.setFontSize(14);
+            doc.text("Best Crop Recommendation", margin, yOffset);
+            yOffset += lineHeight;
+            doc.setFontSize(12);
+            doc.text(`Recommended Crop: ${currentAnalysisData.bestCropRecommendation ? currentAnalysisData.bestCropRecommendation.recommendedCrop : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text("Recommendation Reasons:", margin, yOffset);
+            yOffset += lineHeight;
+            if (currentAnalysisData.bestCropRecommendation && currentAnalysisData.bestCropRecommendation.reasons && currentAnalysisData.bestCropRecommendation.reasons.length > 0) {
+                currentAnalysisData.bestCropRecommendation.reasons.forEach(reason => {
+                    doc.text(`- ${reason}`, margin + 5, yOffset);
+                    yOffset += lineHeight;
+                });
+            } else {
+                doc.text("- No specific reasons provided for best crop recommendation.", margin + 5, yOffset);
+                yOffset += lineHeight;
+            }
+            yOffset += sectionSpacing;
+
+            // Add Crop Rotation Planner to PDF
+            doc.setFontSize(14);
+            doc.text("Crop Rotation Planner", margin, yOffset);
+            yOffset += lineHeight;
+            doc.setFontSize(12);
+            doc.text(`Rotation Strategy: ${currentAnalysisData.cropRotationPlanner ? currentAnalysisData.cropRotationPlanner.rotationStrategy : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text("Recommended Crops for Rotation:", margin, yOffset);
+            yOffset += lineHeight;
+            if (currentAnalysisData.cropRotationPlanner && currentAnalysisData.cropRotationPlanner.recommendedCrops && currentAnalysisData.cropRotationPlanner.recommendedCrops.length > 0) {
+                currentAnalysisData.cropRotationPlanner.recommendedCrops.forEach(crop => {
+                    doc.text(`- ${crop}`, margin + 5, yOffset);
+                    yOffset += lineHeight;
+                });
+            } else {
+                doc.text("- No specific crops recommended for rotation.", margin + 5, yOffset);
+                yOffset += lineHeight;
+            }
+            doc.text("Benefits:", margin, yOffset);
+            yOffset += lineHeight;
+            if (currentAnalysisData.cropRotationPlanner && currentAnalysisData.cropRotationPlanner.benefits && currentAnalysisData.cropRotationPlanner.benefits.length > 0) {
+                currentAnalysisData.cropRotationPlanner.benefits.forEach(benefit => {
+                    doc.text(`- ${benefit}`, margin + 5, yOffset);
+                    yOffset += lineHeight;
+                });
+            } else {
+                doc.text("- No specific benefits listed.", margin + 5, yOffset);
+                yOffset += lineHeight;
+            }
+            yOffset += sectionSpacing;
+
+
+            doc.setFontSize(14);
+            doc.text("Crop Planning Recommendations", margin, yOffset);
+            yOffset += lineHeight;
+            doc.setFontSize(12);
+            doc.text(`Ideal Soil: ${currentAnalysisData.recommendations ? currentAnalysisData.recommendations.idealSoil : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Ideal Water Source: ${currentAnalysisData.recommendations ? currentAnalysisData.recommendations.idealWater : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Ideal Temperature Range: ${currentAnalysisData.recommendations ? currentAnalysisData.recommendations.idealTemperature : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Optimal Growing Season: ${currentAnalysisData.recommendations ? currentAnalysisData.recommendations.growingSeason : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Expected Yield: ${currentAnalysisData.recommendations ? currentAnalysisData.recommendations.expectedYield : 'N/A'}`, margin, yOffset);
+            yOffset += lineHeight;
+            doc.text(`Required Inputs: ${currentAnalysisData.recommendations ? currentAnalysisData.recommendations.requiredInputs : 'N/A'}`, margin, yOffset);
+            yOffset += sectionSpacing;
+
+            const filename = `AgroAI_Analysis_${currentAnalysisData.referralId || 'Report'}.pdf`;
+            doc.save(filename);
+        }
+
+        // Event listener for submitting budget and tools
+        async function submitBudgetAndTools() {
+            const budget = document.getElementById('budget').value;
+            const availableTools = document.getElementById('availableTools').value;
+            const desiredCrop = document.getElementById('desiredCrop').value.trim(); // Get desired crop
+
+            // Get modal elements for initial submission check
+            const modalOverlay = document.getElementById('confirmationModalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalPredictedLat = document.getElementById('modalPredictedLat');
+            const modalPredictedLng = document.getElementById('modalPredictedLng');
+
+            // Hide predicted lat/lng fields for this modal usage
+            modalPredictedLat.style.display = 'none';
+            modalPredictedLng.style.display = 'none';
+
+            // Check if all fields are empty
+            if (!budget && !availableTools && !desiredCrop) {
+                modalTitle.textContent = "Submission Required";
+                modalMessage.innerHTML = "Please enter at least one field (budget, tools, or desired crop) to submit.";
+                modalOverlay.style.display = 'flex';
+                return; // Stop the function if no data is provided
+            }
+            
+            // Show analysis loading screen
+            document.getElementById('analysisOverlay').style.display = 'flex';
+
+            // Simulate satellite analysis and data collection
+            const satelliteData = {
+                rainfallPrediction: `${(Math.random() * 100).toFixed(1)} mm/month`,
+                soilMoistureIndex: `${(Math.random() * 0.5 + 0.2).toFixed(2)}`, // 0.20-0.70
+                temperature: `${(Math.random() * 20 + 15).toFixed(1)}°C`, // 15-35°C
+                seasonalForecast: ["Normal", "Dry Spell Expected", "Wet Season Ahead"][Math.floor(Math.random() * 3)],
+                landElevation: `${(Math.random() * 1000 + 50).toFixed(0)} meters`,
+                slopeData: `${(Math.random() * 10).toFixed(1)}%`
+            };
+
+            const soilType = document.getElementById('soilTypeDisplay').textContent;
+            const predictedWaterSourceSuitability = document.getElementById('predictedWaterSuitability').textContent;
+
+            // Determine desired crop suitability using the new function
+            const cropSuitability = await determineCropSuitability(desiredCrop, soilType, predictedWaterSourceSuitability, satelliteData);
+
+            // Simulate climate risk alerts
+            const climateRisks = simulateClimateRisk(
+                desiredCrop,
+                satelliteData.rainfallPrediction,
+                satelliteData.soilMoistureIndex,
+                satelliteData.seasonalForecast,
+                satelliteData.landElevation,
+                satelliteData.slopeData
+            );
+
+            // Simulate crop rotation planning
+            const cropRotationPlanner = simulateCropRotationPlanner(desiredCrop, soilType);
+
+            const fieldData = {
+                referralId: referralId,
+                fieldLocation: fieldLocationMarker ? { lat: fieldLocationMarker.getLatLng().lat, lng: fieldLocationMarker.getLatLng().lng } : null,
+                soilType: soilType,
+                predictedWaterSource: {
+                    type: document.getElementById('predictedWaterSourceType').textContent,
+                    suitability: predictedWaterSourceSuitability,
+                    coords: predictedWaterSourceCoords
+                },
+                manualWaterSource: manualWaterSourceCoords.lat !== null ? {
+                    type: document.getElementById('manualWaterSourceType').textContent,
+                    suitability: document.getElementById('manualWaterSuitability').textContent,
+                    coords: manualWaterSourceCoords
+                } : null,
+                budget: budget,
+                availableTools: availableTools,
+                desiredCrop: desiredCrop, // Add desired crop to field data
+                cropSuitability: cropSuitability, // Add desired crop suitability results
+                satelliteData: satelliteData,
+                climateRisks: climateRisks, // Add climate risks to field data
+                cropRotationPlanner: cropRotationPlanner, // Add crop rotation planner data
+                recommendations: {
+                    idealSoil: ["Loamy", "Silty", "Clay Loam"][Math.floor(Math.random() * 3)],
+                    idealWater: ["River Water", "Rainwater Harvesting", "Groundwater (Aquifer)"][Math.floor(Math.random() * 3)],
+                    idealTemperature: `${(Math.random() * 10 + 20).toFixed(1)}-${(Math.random() * 5 + 30).toFixed(1)}°C`,
+                    growingSeason: ["Spring-Summer", "Autumn-Winter", "Year-Round (with irrigation)"][Math.floor(Math.random() * 3)],
+                    expectedYield: `${(Math.random() * 5 + 2).toFixed(1)} tons/hectare`,
+                    requiredInputs: ["Fertilizers", "Pesticides", "Improved Seeds", "Irrigation System"][Math.floor(Math.random() * 4)]
+                }
+            };
+            
+            // Determine best crop recommendation
+            const bestCropRecommendation = await determineBestCropRecommendation(fieldData, cropSuitability); // Pass cropSuitability
+            fieldData.bestCropRecommendation = bestCropRecommendation; // Add to fieldData
+
+            try {
+                // Save data to Firestore
+                if (db && userId && appId && referralId) {
+                    const docRef = doc(db, `artifacts/${appId}/users/${userId}/field_data`, referralId);
+                    await setDoc(docRef, fieldData);
+                    console.log("Document successfully written with ID:", referralId);
+                } else {
+                    console.warn("Firestore not initialized or missing required IDs. Data not saved.");
+                }
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                // Potentially show an error message to the user
+            }
+
+            // Simulate analysis time
+            setTimeout(() => {
+                document.getElementById('analysisOverlay').style.display = 'none'; // Hide analysis screen
+                showAnalysisResults(fieldData); // Show analysis results page with the collected data
+            }, 3000); // 3 seconds delay
+        }
+
+
+        // Event Listeners
+        window.onload = async function() { // Made window.onload async
+            await initializeFirebase(); // Await Firebase initialization
+            initMap();
+            generateReferralId(); // Generate initial ID on load
+
+            document.getElementById('getGpsLocationBtn').addEventListener('click', getGpsLocation);
+            document.getElementById('showManualCoordsBtn').addEventListener('click', showManualCoords);
+            document.getElementById('submitManualCoordsBtn').addEventListener('click', submitManualCoords);
+            document.getElementById('searchManualLocationBtn').addEventListener('click', searchManualLocation);
+            document.getElementById('toggleSatelliteViewBtn').addEventListener('click', toggleSatelliteView); // New event listener
+            document.getElementById('goToWaterSourceBtn').addEventListener('click', goToWaterSourceLocation); // New event listener for predicted water source button
+            document.getElementById('selectWaterSourceManuallyBtn').addEventListener('click', enableManualWaterSourceSelection); // New event listener for manual water source selection
+            document.getElementById('goToManualWaterSourceBtn').addEventListener('click', goToManualWaterSourceLocation); // New event listener for view manually selected source
+            document.getElementById('submitBudgetToolsBtn').addEventListener('click', submitBudgetAndTools); // New event listener for budget/tools button
+            document.getElementById('downloadPdfBtn').addEventListener('click', downloadAnalysisPdf); // New event listener for PDF download button
+            document.getElementById('restoreIdBtn').addEventListener('click', showRestoreIdModal); // New event listener for restore ID button
+            document.getElementById('submitRestoreIdBtn').addEventListener('click', handleRestoreFieldData); // New event listener for submit restore ID button
+        };
+
+        // Service Worker related functions
+        function showRestoreIdModal() {
+            document.getElementById('restoreIdModalOverlay').style.display = 'flex';
+            document.getElementById('restoreFieldIdInput').value = ''; // Clear previous input
+            document.getElementById('restoreStatus').textContent = ''; // Clear status
+        }
+
+        async function handleRestoreFieldData() {
+            const fieldIdToRestore = document.getElementById('restoreFieldIdInput').value.trim();
+            const restoreStatusDiv = document.getElementById('restoreStatus');
+
+            if (!fieldIdToRestore) {
+                restoreStatusDiv.textContent = 'Please enter a Referral ID.';
+                restoreStatusDiv.className = 'text-sm text-red-500 mt-2 text-center';
+                return;
+            }
+
+            restoreStatusDiv.textContent = 'Restoring data...';
+            restoreStatusDiv.className = 'text-sm text-green-600 mt-2 text-center';
+
+            try {
+                if (!db || !userId || !appId) {
+                    console.error("Firestore not initialized or missing required IDs. Data not saved.");
+                    restoreStatusDiv.textContent = 'Error: Database not ready.';
+                    restoreStatusDiv.className = 'text-sm text-red-500 mt-2 text-center';
+                    return;
+                }
+
+                const docRef = doc(db, `artifacts/${appId}/users/${userId}/field_data`, fieldIdToRestore);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    populateFormWithRestoredData(data);
+                    restoreStatusDiv.textContent = 'Data restored successfully!';
+                    restoreStatusDiv.className = 'text-sm text-green-500 mt-2 text-center';
+                    setTimeout(() => {
+                        document.getElementById('restoreIdModalOverlay').style.display = 'none';
+                    }, 1500); // Hide modal after a short delay
+                } else {
+                    restoreStatusDiv.textContent = 'No data found for this ID.';
+                    restoreStatusDiv.className = 'text-sm text-red-500 mt-2 text-center';
+                }
+            } catch (error) {
+                console.error("Error restoring document:", error);
+                restoreStatusDiv.textContent = 'Error restoring data. Please try again.';
+                restoreStatusDiv.className = 'text-sm text-red-500 mt-2 text-center';
+            }
+        }
+
+        function populateFormWithRestoredData(data) {
+            // Populate main form fields
+            document.getElementById('latitude').value = data.fieldLocation?.lat?.toFixed(6) || '';
+            document.getElementById('longitude').value = data.fieldLocation?.lng?.toFixed(6) || '';
+            document.getElementById('budget').value = data.budget || '';
+            document.getElementById('availableTools').value = data.availableTools || '';
+            document.getElementById('desiredCrop').value = data.desiredCrop || '';
+
+            // Update map if location data is available
+            if (data.fieldLocation) {
+                updateMap(data.fieldLocation.lat, data.fieldLocation.lng);
+            }
+
+            // Update displayed soil type and water source
+            document.getElementById('soilTypeDisplay').textContent = data.soilType || 'N/A';
+            document.getElementById('predictedWaterSourceType').textContent = data.predictedWaterSource?.type || 'N/A';
+            document.getElementById('predictedWaterSuitability').textContent = data.predictedWaterSource?.suitability || 'N/A';
+            predictedWaterSourceCoords = data.predictedWaterSource?.coords || { lat: null, lng: null };
+
+            if (data.manualWaterSource) {
+                document.getElementById('manualWaterSourceType').textContent = data.manualWaterSource.type;
+                document.getElementById('manualWaterSuitability').textContent = data.manualWaterSource.suitability;
+                manualWaterSourceCoords = data.manualWaterSource.coords;
+                document.getElementById('goToManualWaterSourceBtn').style.display = 'flex'; // Show button
+                if (manualWaterSourceMarker) {
+                    manualWaterSourceMarker.setLatLng([manualWaterSourceCoords.lat, manualWaterSourceCoords.lng]);
+                } else {
+                    manualWaterSourceMarker = L.marker([manualWaterSourceCoords.lat, manualWaterSourceCoords.lng], {
+                        icon: L.divIcon({
+                            className: 'custom-div-icon',
+                            html: '<i class="fa-solid fa-droplet text-green-400 text-2xl"></i>',
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 30]
+                        })
+                    }).addTo(map);
+                }
+                manualWaterSourceMarker.bindPopup("Manually Selected Water Source (Restored)").openPopup();
+
+            } else {
+                document.getElementById('manualWaterSourceType').textContent = 'N/A';
+                document.getElementById('manualWaterSuitability').textContent = 'N/A';
+                document.getElementById('goToManualWaterSourceBtn').style.display = 'none'; // Hide button
+                if (manualWaterSourceMarker) {
+                    map.removeLayer(manualWaterSourceMarker);
+                    manualWaterSourceMarker = null;
+                }
+                manualWaterSourceCoords = { lat: null, lng: null };
+            }
+
+            // Update referral ID display
+            referralId = data.referralId || '';
+            document.getElementById('referralIdDisplay').textContent = referralId;
+
+            // Display a success message or update status
+            document.getElementById('locationStatus').textContent = 'Field data restored from ID!';
+            document.getElementById('locationStatus').className = 'text-sm text-green-500 mt-2 text-center';
+        }
+
+        // Register Service Worker for offline capabilities
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

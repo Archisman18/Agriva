@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" xintegrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    <title>Farm-IQ</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22></text></svg>" />
+</head>
+
+<body>
+    <nav>
+        <div class="logo">
+            <h1>Farm-IQ</h1>
+        </div>
+        <div class="links">
+            <ul>
+                <li><a href="#home">home</a></li>
+                <li><a href="#keyfeatures">key features</a></li>
+                <li><a href="#purpose_of_it">purpose of it</a></li>
+                <li><a href="#howitworks">how it works</a></li>
+            </ul>
+        </div>
+        <div class="button">
+            <ul>
+                <li class="tryit"><a href="Farm-IQ.html">Give a try</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="home" id="home">
+        <div class="overlay">
+            <div class="content">
+                <h1><span>Farm-IQ: </span></h1>
+                <h2>Smart <span class="gold">Satellite AI-Powered Personalized Crop Planner</span></h2>
+                <p>Farm-IQ is an intelligent crop planning tool that uses satellite data and AI to optimize planting schedules, monitor field conditions, and boost yields, helping farmers make data-driven agricultural decisions.</p>
+                <a href="#keyfeatures" class="explore-button">Explore Key features</a>
+            </div>
+        </div>
+        <!-- Corrected video source path to be relative -->
+        <video src="assets/Background Video.mp4" muted loop autoplay></video>
+    </section>
+
+    <section class="keyfeatures" id="keyfeatures">
+        <div class="container">
+            <div class="title">
+                <h1>Key <span>features</span></h1>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="icon">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                    </div>
+                    <h1>Interactive Maps</h1>
+                    <p>Explore dynamic maps showing water sources, soil types, and climate zones instantly.</p>
+                </div>
+                <div class="col">
+                    <div class="icon">
+                        <i class="fa-solid fa-tractor"></i>
+                    </div>
+                    <h1>Farming Tools</h1>
+                    <p>Access essential tools to plan crops, budget resources, and manage agricultural needs.</p>
+                </div>
+                <div class="col">
+                    <div class="icon">
+                        <i class="fa-solid fa-chart-simple"></i>
+                    </div>
+                    <h1>Historical Analysis</h1>
+                    <p>Analyze past weather and soil data to make smarter farming decisions today.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Purpose of it Section -->
+    <section class="purpose_of_it" id="purpose_of_it">
+        <div class="container">
+            <div class="title">
+                <h1>Purpose of <span>it</span></h1>
+            </div>
+            <div class="content">
+                <p>Our platform empowers farmers and communities by combining real-time geolocation, GIS mapping, and AI-driven insights to optimize agricultural decision‑making. By pinpointing nearby water sources and analyzing soil types, users receive tailored crop recommendations based on their budget, tools, and goals. This smart planting assistant not only suggests the best crops for each location, but also explains why they’re ideal—considering soil compatibility, climate patterns, and resource constraints. It brings precision agriculture to anyone’s fingertips, fostering sustainable and efficient farming in even the most resource-scarce regions.</p>
+                <p>The system also includes a dynamic planting calendar with monthly schedules and weather-risk alerts, helping users anticipate droughts, frosts, heatwaves, and other hazards. By using historical data and predictive modeling, the tool anticipates potential threats and supports resilient crop planning—maximizing yield while reducing waste. Whether you're a small-scale farmer, community organizer, or environmental advocate, this platform equips you to make informed, data-driven choices that yield sustainable outcomes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works Section -->
+    <section class="howitworks" id="howitworks">
+        <div class="container">
+            <div class="title">
+                <h1>How it <span>works</span></h1>
+            </div>
+            <div class="content">
+                <ol>
+                    <li>
+                        <h2>1. Location & Mapping</h2>
+                        <p>Upon loading, the app captures your real-time GPS coordinates (with optional manual area selection). We leverage Leaflet.js, a lightweight open-source JS library, to render an interactive map — then overlay high-resolution Esri tiles (via Esri‑Leaflet plugin), pulling imagery and GIS layers such as soil composition and water bodies from multiple sources (USDA, USGS, GeoEye, etc.)</p>
+                    </li>
+                    <li>
+                        <h2>2. Data Collection & Inputs</h2>
+                        <p>The map interface displays nearby water sources and soil types — if users have local knowledge, they can add or adjust these data points manually. You’ll also input your budget, available farming tools, and a list of desired crops.</p>
+                    </li>
+                    <li>
+                        <h2>3. AI-Powered Crop Recommendation</h2>
+                        <p>Our backend uses a machine learning model (e.g., Random Forest or a specialized Transformative Crop Recommendation Model) trained on historical soil, weather, and yield data to calculate the optimal crop(s) based on your inputs. It predicts suitable plants, explains selections with feature importance, and offers monthly planting schedules, using explainable AI techniques like SHAP or LIME for transparency</p>
+                    </li>
+                    <li>
+                        <h2>4. Weather Risk Modeling</h2>
+                        <p>To mitigate climate uncertainty, we integrate real-time weather APIs and embed an AI-driven weather-risk predictor, which thresholds frost, drought, and heatwave probabilities. This is based on multivariate LSTM forecasting tuned for agriculture. The tool alerts you to month-specific risks and recommends remedies like delayed irrigation or drought-tolerant crops.</p>
+                    </li>
+                    <li>
+                        <h2>5. Visual Plan & Outputs</h2>
+                        <p>Finally, results are presented in:</p>
+                        <ul>
+                            <li>Map overlays showing recommended crops per location</li>
+                            <li>An interactive crop calendar with optimal planting months</li>
+                            <li>A dashboard summarizing risk levels, resource needs, and cost breakdown</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 <span>Farm-IQ</span>. All rights reserved.</p>
+    </footer>
+
+    <!-- Removed Typed.js script as there is no element with id="element" -->
+    <script>
+        let navbar = document.querySelector('nav');
+
+        window.onscroll = function () {
+            if (window.scrollY >= 500) {
+                navbar.classList.add('scroll');
+            } else {
+                navbar.classList.remove('scroll');
+            }
+        };
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav .links a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - navbar.offsetHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Smooth scrolling for "Explore Key features" button
+        document.querySelector('.explore-button').addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - navbar.offsetHeight, 
+                    behavior: 'smooth'
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
