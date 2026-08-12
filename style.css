@@ -16,7 +16,7 @@
     --text-dark: #333;
     --text-light: #f0f0f0;
     --bg-light: #f9f9f9;
-    --bg-dark: #2c3e50; /* A dark shade for contrast */
+    --bg-dark: #2c3e50;
     --shadow-light: rgba(75, 75, 75, 0.144);
     --shadow-dark: rgba(0, 0, 0, 0.3);
 }
@@ -40,4 +40,779 @@ ul {
     list-style: none;
 }
 
-/* Navigation Bar */\r\nnav {\r\n    z-index: 1000000;\r\n    width: 100%;\r\n    position: fixed;\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\r\n    padding: 1.5rem 4rem;\r\n    transition: background 0.5s ease, padding 0.5s ease;\r\n    /* Set initial background to transparent */\r\n    background: transparent;\r\n    box-shadow: none; /* Remove shadow initially */\r\n    flex-wrap: wrap;\r\n}\r\n\r\nnav.scroll {\r\n    background: #1a202c; /* Dark background color on scroll */\r\n    padding: 1rem 4rem; /* Slightly reduced padding on scroll */\r\n    box-shadow: 0 2px 10px var(--shadow-dark);\r\n}\r\n\r\nnav .logo h1 {\r\n    font-size: 30px;\r\n    color: var(--text-light);\r\n    font-weight: 700;\r\n}\r\n\r\n/* Hamburger Menu Button */\r\n.hamburger {\r\n    display: none;\r\n    flex-direction: column;\r\n    justify-content: center;\r\n    align-items: center;\r\n    gap: 5px;\r\n    background: none;\r\n    border: none;\r\n    cursor: pointer;\r\n    padding: 8px;\r\n    z-index: 100;\r\n}\r\n\r\n.hamburger span {\r\n    display: block;\r\n    width: 28px;\r\n    height: 3px;\r\n    background-color: var(--text-light);\r\n    border-radius: 3px;\r\n    transition: transform 0.3s ease, opacity 0.3s ease;\r\n}\r\n\r\n.hamburger.active span:nth-child(1) {\r\n    transform: translateY(8px) rotate(45deg);\r\n}\r\n\r\n.hamburger.active span:nth-child(2) {\r\n    opacity: 0;\r\n}\r\n\r\n.hamburger.active span:nth-child(3) {\r\n    transform: translateY(-8px) rotate(-45deg);\r\n}\r\n\r\n/* Nav Menu Container (links + button) */\r\n.nav-menu {\r\n    display: flex;\r\n    align-items: center;\r\n    gap: 30px;\r\n}\r\n\r\nnav .links ul {\r\n    display: flex;\r\n    gap: 30px; /* Use gap for spacing */\r\n}\r\n\r\nnav .links ul li a {\r\n    text-transform: capitalize;\r\n    text-decoration: none;\r\n    font-weight: 500;\r\n    color: var(--text-light);\r\n    transition: color 0.3s ease;\r\n    position: relative; /* For underline effect */\r\n}\r\n\r\nnav .links ul li a::after {\r\n    content: '';\r\n    position: absolute;\r\n    width: 0;\r\n    height: 2px;\r\n    background: var(--primary-green);\r\n    left: 0;\r\n    bottom: -5px;\r\n    transition: width 0.3s ease;\r\n}\r\n\r\nnav .links ul li a:hover::after {\r\n    width: 100%;\r\n}\r\n\r\nnav.scroll .links ul li a::after {\r\n    background: var(--accent-gold);\r\n}\r\n\r\nnav .links ul li a:hover {\r\n    color: var(--primary-green);\r\n}\r\n\r\nnav.scroll .links ul li a:hover {\r\n    color: var(--accent-gold); /* Lighter hover color on dark background */\r\n}\r\n\r\nnav .button ul li.tryit {\r\n    background: var(--primary-green);\r\n    padding: 10px 20px;\r\n    border-radius: 50px; /* More rounded button */\r\n    box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);\r\n    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;\r\n}\r\n\r\nnav .button ul li.tryit:hover {\r\n    background: #2ea85f; /* Slightly darker green on hover */\r\n    transform: translateY(-2px);\r\n    box-shadow: 0 7px 20px rgba(72, 187, 120, 0.6);\r\n}\r\n\r\nnav.scroll .button ul li.tryit {\r\n    background-color: var(--primary-green); /* Keep primary green for the button */\r\n    box-shadow: 0px 5px 15px rgba(72, 187, 120, 0.5);\r\n}\r\n\r\nnav.scroll .button ul li.tryit:hover {\r\n    background-color: #2ea85f; /* Slightly darker green on hover */\r\n    transform: translateY(-2px);\r\n    box-shadow: 0px 7px 20px rgba(72, 187, 120, 0.7);\r\n}\r\n\r\nnav .button ul li.tryit a {\r\n    text-decoration: none;\r\n    text-transform: capitalize;\r\n    color: var(--text-light);\r\n    font-weight: 600;\r\n    transition: color 0.3s ease;\r\n}\r\n\r\nnav.scroll .button ul li.tryit a {\r\n    color: var(--text-light); /* Keep text light for contrast on green */\r\n}\r\n\r\n/* ------------------------------------------------------------ */\r\n/* Home Section */\r\n.home {\r\n    width: 100%;\r\n    height: 100vh;\r\n    position: relative;\r\n    overflow: hidden; /* Ensure video doesn't overflow */\r\n}\r\n\r\n.home .overlay {\r\n    width: 100%;\r\n    height: 100%;\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    background: rgba(0, 0, 0, 0.6); /* Darker overlay for better text readability */\r\n    display: flex; /* Use flexbox for centering content */\r\n    align-items: center;\r\n    justify-content: center;\r\n    text-align: center;\r\n    flex-direction: column;\r\n    padding: 0 20px; /* Add some padding for smaller screens */\r\n    z-index: 10; /* Ensure content is above video */\r\n}\r\n\r\n.home .overlay .content {\r\n    color: var(--text-light);\r\n    max-width: 900px; /* Limit content width */\r\n    z-index: 1; /* Ensure content is above overlay background */\r\n    padding: 0 1rem;\r\n}\r\n\r\n.home .overlay .content h1 {\r\n    font-size: clamp(2.5rem, 5vw, 4.5rem); /* Responsive font size */\r\n    text-transform: uppercase;\r\n    margin-bottom: 20px;\r\n    font-weight: 800;\r\n    line-height: 1.2;\r\n}\r\n\r\n.home .overlay .content h2 {\r\n    font-size: clamp(1.2rem, 3vw, 2rem);\r\n    font-weight: 600;\r\n    margin-bottom: 15px;\r\n    line-height: 1.4;\r\n}\r\n\r\n.home .overlay .content h1 span.gold {\r\n    color: var(--accent-gold);\r\n}\r\n\r\n.home .overlay .content h1 span {\r\n    color: #37e187; /* A vibrant green for emphasis */\r\n}\r\n\r\n.home .overlay .content p {\r\n    font-size: clamp(1rem, 2vw, 1.25rem); /* Responsive font size */\r\n    text-align: center;\r\n    text-transform: capitalize;\r\n    margin-bottom: 30px;\r\n    opacity: 0.9;\r\n}\r\n\r\n.home .overlay .content a.explore-button {\r\n    background-color: var(--accent-gold);\r\n    color: var(--text-dark);\r\n    box-shadow: 0px 5px 15px rgba(251, 211, 141, 0.5);\r\n    margin-top: 25px;\r\n    display: inline-block;\r\n    padding: 15px 30px;\r\n    border-radius: 50px;\r\n    text-decoration: none;\r\n    text-transform: uppercase;\r\n    font-weight: 600;\r\n    letter-spacing: 1px;\r\n    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;\r\n}\r\n\r\n.home .overlay .content a.explore-button:hover {\r\n    background-color: #e6c27e;\r\n    transform: translateY(-3px);\r\n    box-shadow: 0px 8px 20px rgba(251, 211, 141, 0.7);\r\n}\r\n\r\n.home video {\r\n    width: 100%;\r\n    height: 100%;\r\n    object-fit: cover;\r\n    position: absolute;\r\n    top: 0;\r\n    left: 0;\r\n    z-index: -1; /* Place video behind overlay */\r\n}\r\n\r\n/* ------------------------------------------------------------ */\r\n/* General Section Styling */\r\nsection {\r\n    padding: 100px 4rem; /* Consistent padding for all sections */\r\n    margin-top: 0; /* Reset margin-top from inline style */\r\n    scroll-margin-top: 80px; /* Account for fixed nav bar */\r\n    position: relative;\r\n    overflow: hidden; /* Clear floats/prevent content overflow */\r\n}\r\n\r\nsection:nth-of-type(even) {\r\n    background-color: var(--bg-light); /* Alternate background for visual separation */\r\n}\r\n\r\nsection:nth-of-type(odd):not(.home) {\r\n    background-color: #fff;\r\n}\r\n\r\nsection .container {\r\n    max-width: 1200px;\r\n    margin: 0 auto;\r\n    padding: 0 20px; /* Inner padding for container */\r\n}\r\n\r\nsection .title {\r\n    text-align: center;\r\n    margin-bottom: 60px;\r\n    font-size: clamp(2rem, 4vw, 2.5rem);\r\n    font-weight: 700;\r\n    color: var(--dark-green);\r\n}\r\n\r\nsection .title h1 {\r\n    text-transform: capitalize;\r\n    position: relative;\r\n    display: inline-block;\r\n}\r\n\r\nsection .title h1::after {\r\n    content: '';\r\n    position: absolute;\r\n    width: 60%;\r\n    height: 4px;\r\n    background: var(--primary-green);\r\n    left: 50%;\r\n    transform: translateX(-50%);\r\n    bottom: -10px;\r\n    border-radius: 2px;\r\n}\r\n\r\n/* Key Features Section */\r\nsection.keyfeatures {\r\n    background: linear-gradient(to bottom, #fff 0%, #e6ffe6 100%); /* Subtle gradient for flow */\r\n}\r\n\r\nsection.keyfeatures .row {\r\n    display: flex;\r\n    justify-content: center;\r\n    flex-wrap: wrap;\r\n    gap: 30px; /* Increased gap for better spacing */\r\n}\r\n\r\nsection.keyfeatures .row .col {\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n    flex-direction: column;\r\n    padding: 30px;\r\n    width: 100%; /* Full width on small screens */\r\n    max-width: 350px; /* Max width for cards */\r\n    min-height: 250px; /* Ensure consistent height */\r\n    background-color: #fff;\r\n    border-radius: 15px;\r\n    box-shadow: 0 10px 30px var(--shadow-light);\r\n    transition: transform 0.3s ease, box-shadow 0.3s ease;\r\n    text-align: center;\r\n}\r\n\r\nsection.keyfeatures .row .col:hover {\r\n    transform: translateY(-10px);\r\n    box-shadow: 0 15px 40px rgba(75, 75, 75, 0.25);\r\n}\r\n\r\nsection.keyfeatures .row .col .icon {\r\n    margin-bottom: 20px;\r\n}\r\n\r\nsection.keyfeatures .row .col .icon i {\r\n    font-size: 55px; /* Larger icons */\r\n    color: var(--primary-green);\r\n    transition: transform 0.3s ease;\r\n}\r\n\r\nsection.keyfeatures .row .col:hover .icon i {\r\n    transform: scale(1.1);\r\n}\r\n\r\nsection.keyfeatures .row .col h1 {\r\n    margin-bottom: 15px;\r\n    font-size: 24px;\r\n    color: var(--dark-green);\r\n    text-transform: capitalize;\r\n}\r\n\r\nsection.keyfeatures .row .col p {\r\n    color: #555;\r\n    font-size: 15px;\r\n    line-height: 1.8;\r\n}\r\n\r\n/* Purpose of It Section */\r\nsection.purpose_of_it {\r\n    background-color: #f0f8f0; /* Light green background */\r\n    padding: 100px 4rem;\r\n    position: relative;\r\n    z-index: 1; /* Ensure it's above other elements if needed */\r\n}\r\n\r\nsection.purpose_of_it .content {\r\n    max-width: 900px;\r\n    margin: 0 auto;\r\n    font-size: 1.1rem;\r\n    line-height: 1.8;\r\n    text-align: justify; /* Justify text content */\r\n    color: #444;\r\n}\r\n\r\nsection.purpose_of_it .content p {\r\n    margin-bottom: 20px;\r\n}\r\n\r\n/* How It Works Section */\r\nsection.howitworks {\r\n    background-color: #fff; /* White background */\r\n    padding: 100px 4rem;\r\n    position: relative;\r\n    z-index: 1;\r\n}\r\n\r\nsection.howitworks .content {\r\n    max-width: 900px;\r\n    margin: 0 auto;\r\n}\r\n\r\nsection.howitworks ol {\r\n    counter-reset: my-awesome-counter; /* Initialize counter */\r\n    list-style: none; /* Remove default list style */\r\n    padding: 0;\r\n}\r\n\r\nsection.howitworks ol li {\r\n    counter-increment: my-awesome-counter; /* Increment counter */\r\n    margin-bottom: 40px;\r\n    position: relative;\r\n    padding-left: 70px; /* Space for the custom number */\r\n}\r\n\r\nsection.howitworks ol li::before {\r\n    content: counter(my-awesome-counter);\r\n    position: absolute;\r\n    left: 0;\r\n    top: 0;\r\n    width: 50px;\r\n    height: 50px;\r\n    background-color: var(--primary-green);\r\n    color: var(--text-light);\r\n    border-radius: 50%;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    font-size: 24px;\r\n    font-weight: 700;\r\n    box-shadow: 0 5px 15px rgba(56, 161, 105, 0.4);\r\n}\r\n\r\nsection.howitworks ol li h2 {\r\n    font-size: 22px;\r\n    color: var(--dark-green);\r\n    margin-bottom: 10px;\r\n}\r\n\r\nsection.howitworks ol li p {\r\n    font-size: 1rem;\r\n    line-height: 1.7;\r\n    color: #555;\r\n}\r\n\r\nsection.howitworks ul {\r\n    margin-top: 20px;\r\n    padding-left: 20px;\r\n    list-style: disc; /* Use disc for sub-list */\r\n    color: #555;\r\n}\r\n\r\nsection.howitworks ul li {\r\n    margin-bottom: 10px;\r\n    padding-left: 0; /* Reset padding for sub-list items */\r\n}\r\n\r\nsection.howitworks ul li::before {\r\n    content: none; /* Remove custom number for sub-list */\r\n}\r\n\r\n/* Footer Styling */\r\nfooter {\r\n    background-color: var(--dark-green);\r\n    color: var(--text-light);\r\n    text-align: center;\r\n    padding: 30px 0;\r\n    font-size: 15px;\r\n    margin-top: 0; /* Ensure no extra margin */\r\n    box-shadow: 0 -2px 10px var(--shadow-dark);\r\n}\r\n\r\nfooter span {\r\n    color: var(--accent-gold);\r\n}\r\n\r\n/* ============================================================ */\r\n/* Responsive Design Breakpoints                                 */\r\n/* ============================================================ */\r\n\r\n/* Tablet and larger phones */\r\n@media (max-width: 1024px) {\r\n    nav {\r\n        padding: 1.5rem 2rem;\r\n    }\r\n\r\n    nav.scroll {\r\n        padding: 1rem 2rem;\r\n    }\r\n\r\n    .home .overlay .content h1 {\r\n        font-size: clamp(2rem, 6vw, 4rem);\r\n    }\r\n\r\n    .home .overlay .content p {\r\n        width: auto; /* Allow paragraph to take full width */\r\n        padding: 0 15px;\r\n    }\r\n\r\n    section {\r\n        padding: 80px 2rem;\r\n    }\r\n\r\n    section .title {\r\n        font-size: clamp(1.8rem, 5vw, 2.2rem);\r\n    }\r\n\r\n    section.keyfeatures .row .col {\r\n        max-width: 320px;\r\n    }\r\n\r\n    section.purpose_of_it {\r\n        padding: 80px 2rem;\r\n    }\r\n\r\n    section.howitworks {\r\n        padding: 80px 2rem;\r\n    }\r\n}\r\n\r\n/* Smaller phones and portrait tablets */\r\n@media (max-width: 768px) {\r\n    /* Show hamburger, hide nav-menu by default */\r\n    .hamburger {\r\n        display: flex;\r\n    }\r\n\r\n    .nav-menu {\r\n        display: none;\r\n        flex-direction: column;\r\n        width: 100%;\r\n        background: rgba(26, 32, 44, 0.97);\r\n        border-radius: 0 0 15px 15px;\r\n        padding: 1.5rem 1rem;\r\n        gap: 15px;\r\n        margin-top: 10px;\r\n        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);\r\n        animation: slideDown 0.3s ease-out;\r\n    }\r\n\r\n    .nav-menu.active {\r\n        display: flex;\r\n    }\r\n\r\n    @keyframes slideDown {\r\n        from {\r\n            opacity: 0;\r\n            transform: translateY(-10px);\r\n        }\r\n        to {\r\n            opacity: 1;\r\n            transform: translateY(0);\r\n        }\r\n    }\r\n\r\n    nav {\r\n        flex-wrap: wrap;\r\n        padding: 1rem 1.5rem;\r\n        background: rgba(26, 32, 44, 0.85);\r\n        backdrop-filter: blur(10px);\r\n    }\r\n\r\n    nav.scroll {\r\n        padding: 0.8rem 1.5rem;\r\n    }\r\n\r\n    nav .logo {\r\n        flex: 1;\r\n    }\r\n\r\n    nav .links ul {\r\n        flex-direction: column;\r\n        gap: 12px;\r\n        text-align: center;\r\n        width: 100%;\r\n    }\r\n\r\n    nav .links ul li a {\r\n        font-size: 1.05rem;\r\n        display: block;\r\n        padding: 8px 0;\r\n    }\r\n\r\n    nav .button {\r\n        width: 100%;\r\n        text-align: center;\r\n    }\r\n\r\n    nav .button ul {\r\n        justify-content: center;\r\n    }\r\n\r\n    nav .button ul li.tryit {\r\n        width: 100%;\r\n        text-align: center;\r\n    }\r\n\r\n    .home .overlay .content h1 {\r\n        font-size: clamp(1.8rem, 8vw, 3.5rem);\r\n    }\r\n\r\n    .home .overlay .content h2 {\r\n        font-size: clamp(1rem, 4vw, 1.5rem);\r\n    }\r\n\r\n    .home .overlay .content p {\r\n        font-size: clamp(0.9rem, 3vw, 1.1rem);\r\n        padding: 0 10px;\r\n    }\r\n\r\n    .home .overlay .content a.explore-button {\r\n        padding: 12px 24px;\r\n        font-size: 0.9rem;\r\n    }\r\n\r\n    section {\r\n        padding: 60px 1.5rem;\r\n    }\r\n\r\n    section .title {\r\n        font-size: clamp(1.6rem, 6vw, 2rem);\r\n        margin-bottom: 40px;\r\n    }\r\n\r\n    section.keyfeatures .row {\r\n        gap: 20px;\r\n    }\r\n\r\n    section.keyfeatures .row .col {\r\n        width: 100%; /* Full width on mobile */\r\n        max-width: 100%;\r\n        min-height: auto;\r\n        padding: 25px 20px;\r\n    }\r\n\r\n    section.howitworks ol li {\r\n        padding-left: 60px;\r\n    }\r\n\r\n    section.howitworks ol li::before {\r\n        width: 45px;\r\n        height: 45px;\r\n        font-size: 20px;\r\n    }\r\n\r\n    section.howitworks ol li h2 {\r\n        font-size: 18px;\r\n    }\r\n\r\n    section.purpose_of_it {\r\n        padding: 60px 1.5rem;\r\n    }\r\n\r\n    section.purpose_of_it .content {\r\n        font-size: 1rem;\r\n        text-align: left;\r\n    }\r\n\r\n    section.howitworks {\r\n        padding: 60px 1.5rem;\r\n    }\r\n\r\n    section.howitworks .content p {\r\n        font-size: 0.95rem;\r\n    }\r\n\r\n    footer {\r\n        padding: 20px 1rem;\r\n        font-size: 14px;\r\n    }\r\n}\r\n\r\n/* Extra small phones (e.g., iPhone SE, <480px) */\r\n@media (max-width: 480px) {\r\n    nav {\r\n        padding: 0.8rem 1rem;\r\n    }\r\n\r\n    nav.scroll {\r\n        padding: 0.6rem 1rem;\r\n    }\r\n\r\n    nav .logo h1 {\r\n        font-size: 24px;\r\n    }\r\n\r\n    nav .links ul li a {\r\n        font-size: 0.95rem;\r\n        padding: 6px 0;\r\n    }\r\n\r\n    nav .button ul li.tryit {\r\n        padding: 8px 18px;\r\n    }\r\n\r\n    .home {\r\n        height: 100svh; /* Use small viewport height for mobile browsers */\r\n    }\r\n\r\n    .home .overlay .content {\r\n        padding: 0 0.5rem;\r\n    }\r\n\r\n    .home .overlay .content h1 {\r\n        font-size: clamp(1.5rem, 9vw, 3rem);\r\n        margin-bottom: 12px;\r\n    }\r\n\r\n    .home .overlay .content h2 {\r\n        font-size: clamp(0.9rem, 5vw, 1.3rem);\r\n        margin-bottom: 10px;\r\n    }\r\n\r\n    .home .overlay .content p {\r\n        font-size: clamp(0.85rem, 4vw, 1rem);\r\n        padding: 0 5px;\r\n        margin-bottom: 20px;\r\n    }\r\n\r\n    .home .overlay .content a.explore-button {\r\n        padding: 10px 20px;\r\n        font-size: 0.85rem;\r\n        margin-top: 15px;\r\n    }\r\n\r\n    section {\r\n        padding: 50px 1rem;\r\n    }\r\n\r\n    section .title {\r\n        margin-bottom: 30px;\r\n    }\r\n\r\n    section.keyfeatures .row .col {\r\n        padding: 20px 15px;\r\n    }\r\n\r\n    section.keyfeatures .row .col h1 {\r\n        font-size: 20px;\r\n    }\r\n\r\n    section.keyfeatures .row .col p {\r\n        font-size: 14px;\r\n    }\r\n\r\n    section.keyfeatures .row .col .icon i {\r\n        font-size: 42px;\r\n    }\r\n\r\n    section.purpose_of_it {\r\n        padding: 50px 1rem;\r\n    }\r\n\r\n    section.purpose_of_it .content {\r\n        font-size: 0.9rem;\r\n    }\r\n\r\n    section.howitworks {\r\n        padding: 50px 1rem;\r\n    }\r\n\r\n    section.howitworks ol li {\r\n        padding-left: 50px;\r\n    }\r\n\r\n    section.howitworks ol li::before {\r\n        width: 38px;\r\n        height: 38px;\r\n        font-size: 17px;\r\n    }\r\n\r\n    section.howitworks ol li h2 {\r\n        font-size: 16px;\r\n    }\r\n\r\n    section.howitworks ol li p {\r\n        font-size: 0.85rem;\r\n    }\r\n}\r\n\r\n/* Ensure consistent content alignment for justified text */\r\nsection .content {\r\n    text-align: justify; /* Apply to all content blocks where justification is desired */\r\n    hyphens: auto; /* Enable hyphenation for better justification */\r\n}\r\n\r\n/* On small screens, switch to left-aligned text for better readability */\r\n@media (max-width: 480px) {\r\n    section .content {\r\n        text-align: left;\r\n        hyphens: none;\r\n    }\r\n}
+/* Navigation Bar */
+nav {
+    z-index: 1000000;
+    width: 100%;
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    transition: background 0.5s ease, padding 0.5s ease;
+    background: transparent;
+    box-shadow: none;
+    flex-wrap: wrap;
+}
+
+nav.scroll {
+    background: #1a202c;
+    padding: 1rem 4rem;
+    box-shadow: 0 2px 10px var(--shadow-dark);
+}
+
+nav .logo h1 {
+    font-size: 30px;
+    color: var(--text-light);
+    font-weight: 700;
+}
+
+/* Hamburger Menu Button */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 100;
+}
+
+.hamburger span {
+    display: block;
+    width: 28px;
+    height: 3px;
+    background-color: var(--text-light);
+    border-radius: 3px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Nav Menu Container (links + button) */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+nav .links ul {
+    display: flex;
+    gap: 30px;
+}
+
+nav .links ul li a {
+    text-transform: capitalize;
+    text-decoration: none;
+    font-weight: 500;
+    color: var(--text-light);
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+nav .links ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    background: var(--primary-green);
+    left: 0;
+    bottom: -5px;
+    transition: width 0.3s ease;
+}
+
+nav .links ul li a:hover::after {
+    width: 100%;
+}
+
+nav.scroll .links ul li a::after {
+    background: var(--accent-gold);
+}
+
+nav .links ul li a:hover {
+    color: var(--primary-green);
+}
+
+nav.scroll .links ul li a:hover {
+    color: var(--accent-gold);
+}
+
+nav .button ul li.tryit {
+    background: var(--primary-green);
+    padding: 10px 20px;
+    border-radius: 50px;
+    box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+nav .button ul li.tryit:hover {
+    background: #2ea85f;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(72, 187, 120, 0.6);
+}
+
+nav.scroll .button ul li.tryit {
+    background-color: var(--primary-green);
+    box-shadow: 0px 5px 15px rgba(72, 187, 120, 0.5);
+}
+
+nav.scroll .button ul li.tryit:hover {
+    background-color: #2ea85f;
+    transform: translateY(-2px);
+    box-shadow: 0px 7px 20px rgba(72, 187, 120, 0.7);
+}
+
+nav .button ul li.tryit a {
+    text-decoration: none;
+    text-transform: capitalize;
+    color: var(--text-light);
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+nav.scroll .button ul li.tryit a {
+    color: var(--text-light);
+}
+
+/* ------------------------------------------------------------ */
+/* Home Section */
+.home {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.home .overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    padding: 0 20px;
+    z-index: 10;
+}
+
+.home .overlay .content {
+    color: var(--text-light);
+    max-width: 900px;
+    z-index: 1;
+    padding: 0 1rem;
+}
+
+.home .overlay .content h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.home .overlay .content h2 {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    font-weight: 600;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.home .overlay .content h1 span.gold {
+    color: var(--accent-gold);
+}
+
+.home .overlay .content h1 span {
+    color: #37e187;
+}
+
+.home .overlay .content p {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    text-align: center;
+    text-transform: capitalize;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.home .overlay .content a.explore-button {
+    background-color: var(--accent-gold);
+    color: var(--text-dark);
+    box-shadow: 0px 5px 15px rgba(251, 211, 141, 0.5);
+    margin-top: 25px;
+    display: inline-block;
+    padding: 15px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.home .overlay .content a.explore-button:hover {
+    background-color: #e6c27e;
+    transform: translateY(-3px);
+    box-shadow: 0px 8px 20px rgba(251, 211, 141, 0.7);
+}
+
+.home video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+/* ------------------------------------------------------------ */
+/* General Section Styling */
+section {
+    padding: 100px 4rem;
+    margin-top: 0;
+    scroll-margin-top: 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+section:nth-of-type(even) {
+    background-color: var(--bg-light);
+}
+
+section:nth-of-type(odd):not(.home) {
+    background-color: #fff;
+}
+
+section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+section .title {
+    text-align: center;
+    margin-bottom: 60px;
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--dark-green);
+}
+
+section .title h1 {
+    text-transform: capitalize;
+    position: relative;
+    display: inline-block;
+}
+
+section .title h1::after {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 4px;
+    background: var(--primary-green);
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -10px;
+    border-radius: 2px;
+}
+
+/* Key Features Section */
+section.keyfeatures {
+    background: linear-gradient(to bottom, #fff 0%, #e6ffe6 100%);
+}
+
+section.keyfeatures .row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+section.keyfeatures .row .col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 30px;
+    width: 100%;
+    max-width: 350px;
+    min-height: 250px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px var(--shadow-light);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+section.keyfeatures .row .col:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(75, 75, 75, 0.25);
+}
+
+section.keyfeatures .row .col .icon {
+    margin-bottom: 20px;
+}
+
+section.keyfeatures .row .col .icon i {
+    font-size: 55px;
+    color: var(--primary-green);
+    transition: transform 0.3s ease;
+}
+
+section.keyfeatures .row .col:hover .icon i {
+    transform: scale(1.1);
+}
+
+section.keyfeatures .row .col h1 {
+    margin-bottom: 15px;
+    font-size: 24px;
+    color: var(--dark-green);
+    text-transform: capitalize;
+}
+
+section.keyfeatures .row .col p {
+    color: #555;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+/* Purpose of It Section */
+section.purpose_of_it {
+    background-color: #f0f8f0;
+    padding: 100px 4rem;
+    position: relative;
+    z-index: 1;
+}
+
+section.purpose_of_it .content {
+    max-width: 900px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    text-align: justify;
+    color: #444;
+}
+
+section.purpose_of_it .content p {
+    margin-bottom: 20px;
+}
+
+/* How It Works Section */
+section.howitworks {
+    background-color: #fff;
+    padding: 100px 4rem;
+    position: relative;
+    z-index: 1;
+}
+
+section.howitworks .content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+section.howitworks ol {
+    counter-reset: my-awesome-counter;
+    list-style: none;
+    padding: 0;
+}
+
+section.howitworks ol li {
+    counter-increment: my-awesome-counter;
+    margin-bottom: 40px;
+    position: relative;
+    padding-left: 70px;
+}
+
+section.howitworks ol li::before {
+    content: counter(my-awesome-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-green);
+    color: var(--text-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    box-shadow: 0 5px 15px rgba(56, 161, 105, 0.4);
+}
+
+section.howitworks ol li h2 {
+    font-size: 22px;
+    color: var(--dark-green);
+    margin-bottom: 10px;
+}
+
+section.howitworks ol li p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #555;
+}
+
+section.howitworks ul {
+    margin-top: 20px;
+    padding-left: 20px;
+    list-style: disc;
+    color: #555;
+}
+
+section.howitworks ul li {
+    margin-bottom: 10px;
+    padding-left: 0;
+}
+
+section.howitworks ul li::before {
+    content: none;
+}
+
+/* Footer Styling */
+footer {
+    background-color: var(--dark-green);
+    color: var(--text-light);
+    text-align: center;
+    padding: 30px 0;
+    font-size: 15px;
+    margin-top: 0;
+    box-shadow: 0 -2px 10px var(--shadow-dark);
+}
+
+footer span {
+    color: var(--accent-gold);
+}
+
+/* ============================================================ */
+/* Responsive Design Breakpoints                                 */
+/* ============================================================ */
+
+/* Tablet and larger phones */
+@media (max-width: 1024px) {
+    nav {
+        padding: 1.5rem 2rem;
+    }
+
+    nav.scroll {
+        padding: 1rem 2rem;
+    }
+
+    .home .overlay .content h1 {
+        font-size: clamp(2rem, 6vw, 4rem);
+    }
+
+    .home .overlay .content p {
+        width: auto;
+        padding: 0 15px;
+    }
+
+    section {
+        padding: 80px 2rem;
+    }
+
+    section .title {
+        font-size: clamp(1.8rem, 5vw, 2.2rem);
+    }
+
+    section.keyfeatures .row .col {
+        max-width: 320px;
+    }
+
+    section.purpose_of_it {
+        padding: 80px 2rem;
+    }
+
+    section.howitworks {
+        padding: 80px 2rem;
+    }
+}
+
+/* Smaller phones and portrait tablets */
+@media (max-width: 768px) {
+    /* Show hamburger, hide nav-menu by default */
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background: rgba(26, 32, 44, 0.97);
+        border-radius: 0 0 15px 15px;
+        padding: 1.5rem 1rem;
+        gap: 15px;
+        margin-top: 10px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .nav-menu.active {
+        display: flex;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    nav {
+        flex-wrap: wrap;
+        padding: 1rem 1.5rem;
+        background: rgba(26, 32, 44, 0.85);
+        backdrop-filter: blur(10px);
+    }
+
+    nav.scroll {
+        padding: 0.8rem 1.5rem;
+    }
+
+    nav .logo {
+        flex: 1;
+    }
+
+    nav .links ul {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        width: 100%;
+    }
+
+    nav .links ul li a {
+        font-size: 1.05rem;
+        display: block;
+        padding: 8px 0;
+    }
+
+    nav .button {
+        width: 100%;
+        text-align: center;
+    }
+
+    nav .button ul {
+        justify-content: center;
+    }
+
+    nav .button ul li.tryit {
+        width: 100%;
+        text-align: center;
+    }
+
+    .home .overlay .content h1 {
+        font-size: clamp(1.8rem, 8vw, 3.5rem);
+    }
+
+    .home .overlay .content h2 {
+        font-size: clamp(1rem, 4vw, 1.5rem);
+    }
+
+    .home .overlay .content p {
+        font-size: clamp(0.9rem, 3vw, 1.1rem);
+        padding: 0 10px;
+    }
+
+    .home .overlay .content a.explore-button {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+    }
+
+    section {
+        padding: 60px 1.5rem;
+    }
+
+    section .title {
+        font-size: clamp(1.6rem, 6vw, 2rem);
+        margin-bottom: 40px;
+    }
+
+    section.keyfeatures .row {
+        gap: 20px;
+    }
+
+    section.keyfeatures .row .col {
+        width: 100%;
+        max-width: 100%;
+        min-height: auto;
+        padding: 25px 20px;
+    }
+
+    section.howitworks ol li {
+        padding-left: 60px;
+    }
+
+    section.howitworks ol li::before {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    section.howitworks ol li h2 {
+        font-size: 18px;
+    }
+
+    section.purpose_of_it {
+        padding: 60px 1.5rem;
+    }
+
+    section.purpose_of_it .content {
+        font-size: 1rem;
+        text-align: left;
+    }
+
+    section.howitworks {
+        padding: 60px 1.5rem;
+    }
+
+    section.howitworks .content p {
+        font-size: 0.95rem;
+    }
+
+    footer {
+        padding: 20px 1rem;
+        font-size: 14px;
+    }
+}
+
+/* Extra small phones (e.g., iPhone SE, <480px) */
+@media (max-width: 480px) {
+    nav {
+        padding: 0.8rem 1rem;
+    }
+
+    nav.scroll {
+        padding: 0.6rem 1rem;
+    }
+
+    nav .logo h1 {
+        font-size: 24px;
+    }
+
+    nav .links ul li a {
+        font-size: 0.95rem;
+        padding: 6px 0;
+    }
+
+    nav .button ul li.tryit {
+        padding: 8px 18px;
+    }
+
+    .home {
+        height: 100svh;
+    }
+
+    .home .overlay .content {
+        padding: 0 0.5rem;
+    }
+
+    .home .overlay .content h1 {
+        font-size: clamp(1.5rem, 9vw, 3rem);
+        margin-bottom: 12px;
+    }
+
+    .home .overlay .content h2 {
+        font-size: clamp(0.9rem, 5vw, 1.3rem);
+        margin-bottom: 10px;
+    }
+
+    .home .overlay .content p {
+        font-size: clamp(0.85rem, 4vw, 1rem);
+        padding: 0 5px;
+        margin-bottom: 20px;
+    }
+
+    .home .overlay .content a.explore-button {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        margin-top: 15px;
+    }
+
+    section {
+        padding: 50px 1rem;
+    }
+
+    section .title {
+        margin-bottom: 30px;
+    }
+
+    section.keyfeatures .row .col {
+        padding: 20px 15px;
+    }
+
+    section.keyfeatures .row .col h1 {
+        font-size: 20px;
+    }
+
+    section.keyfeatures .row .col p {
+        font-size: 14px;
+    }
+
+    section.keyfeatures .row .col .icon i {
+        font-size: 42px;
+    }
+
+    section.purpose_of_it {
+        padding: 50px 1rem;
+    }
+
+    section.purpose_of_it .content {
+        font-size: 0.9rem;
+    }
+
+    section.howitworks {
+        padding: 50px 1rem;
+    }
+
+    section.howitworks ol li {
+        padding-left: 50px;
+    }
+
+    section.howitworks ol li::before {
+        width: 38px;
+        height: 38px;
+        font-size: 17px;
+    }
+
+    section.howitworks ol li h2 {
+        font-size: 16px;
+    }
+
+    section.howitworks ol li p {
+        font-size: 0.85rem;
+    }
+}
+
+/* Ensure consistent content alignment for justified text */
+section .content {
+    text-align: justify;
+    hyphens: auto;
+}
+
+/* On small screens, switch to left-aligned text for better readability */
+@media (max-width: 480px) {
+    section .content {
+        text-align: left;
+        hyphens: none;
+    }
+}
