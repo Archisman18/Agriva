@@ -18,18 +18,25 @@
         <div class="logo">
             <h1>Agriva</h1>
         </div>
-        <div class="links">
-            <ul>
-                <li><a href="#home">home</a></li>
-                <li><a href="#keyfeatures">key features</a></li>
-                <li><a href="#purpose_of_it">purpose of it</a></li>
-                <li><a href="#howitworks">how it works</a></li>
-            </ul>
-        </div>
-        <div class="button">
-            <ul>
-                <li class="tryit"><a href="Agriva.html">Give a try</a></li>
-            </ul>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-menu" id="navMenu">
+            <div class="links">
+                <ul>
+                    <li><a href="#home">home</a></li>
+                    <li><a href="#keyfeatures">key features</a></li>
+                    <li><a href="#purpose_of_it">purpose of it</a></li>
+                    <li><a href="#howitworks">how it works</a></li>
+                </ul>
+            </div>
+            <div class="button">
+                <ul>
+                    <li class="tryit"><a href="Agriva.html">Give a try</a></li>
+                </ul>
+            </div>
         </div>
     </nav>
 
@@ -163,6 +170,8 @@
     <!-- Removed Typed.js script as there is no element with id="element" -->
     <script>
         let navbar = document.querySelector('nav');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const navMenu = document.getElementById('navMenu');
 
         window.onscroll = function () {
             if (window.scrollY >= 500) {
@@ -171,6 +180,20 @@
                 navbar.classList.remove('scroll');
             }
         };
+
+        // Hamburger menu toggle
+        hamburgerBtn.addEventListener('click', function () {
+            navMenu.classList.toggle('active');
+            hamburgerBtn.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked
+        document.querySelectorAll('nav .links a, nav .button a').forEach(link => {
+            link.addEventListener('click', function () {
+                navMenu.classList.remove('active');
+                hamburgerBtn.classList.remove('active');
+            });
+        });
 
         // Smooth scrolling for navigation links
         document.querySelectorAll('nav .links a').forEach(anchor => {
