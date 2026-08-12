@@ -1,10 +1,10 @@
 // Define a cache name for your application's assets
-const CACHE_NAME = 'farmiq-cache-v1';
+const CACHE_NAME = 'agriva-cache-v1';
 
 // List of URLs to cache during installation
 const urlsToCache = [
-    'Farm-IQ.HTML',
-    'Farm-IQ.js'
+    'Agriva.HTML',
+    'Agriva.js'
     // Removed external CDN URLs from pre-caching due to CORS issues during install.
     // These resources will still be fetched from the network when online,
     // and the browser's standard HTTP cache or the Service Worker's fetch handler

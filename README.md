@@ -1,4 +1,4 @@
-FARM-IQ is a smart farm management system designed to streamline operations, boost productivity, and enable data-driven decision-making.
+Agriva is a smart farm management system designed to streamline operations, boost productivity, and enable data-driven decision-making.
 
 ## Key Features
 - **Crop Management**: Plan, track, and optimize crop cycles.

@@ -1,140 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm-IQ: Your personal farming assistant</title>
+    <title>Agriva: Your personal farming assistant</title>
     <!-- Favicon (using an emoji) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <!-- Font Awesome CDN for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
         /* Embedded style.css content with green gradient theme */
         body {
             font-family: "poppins", sans-serif;
-            background: linear-gradient(to bottom right, #e0ffe0, #c0f0c0); /* Light green gradient */
-            color: #2c5234; /* Dark green text for contrast */
+            background: linear-gradient(to bottom right, #e0ffe0, #c0f0c0);
+            /* Light green gradient */
+            color: #2c5234;
+            /* Dark green text for contrast */
         }
+
         #map {
-            height: 400px; /* Fixed height for the map */
-            width: 100%; /* Full width */
-            border-radius: 0.75rem; /* Rounded corners for map */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            height: 400px;
+            /* Fixed height for the map */
+            width: 100%;
+            /* Full width */
+            border-radius: 0.75rem;
+            /* Rounded corners for map */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            /* Subtle shadow */
         }
+
         .container {
-            max-width: 800px; /* Max width for content */
+            max-width: 800px;
+            /* Max width for content */
         }
+
         input[type="text"] {
             padding: 0.75rem 1rem;
-            border: 1px solid #a7d9a7; /* Muted green border */
+            border: 1px solid #a7d9a7;
+            /* Muted green border */
             border-radius: 0.5rem;
             font-size: 1rem;
             line-height: 1.5;
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-            background-color: #f0fff0; /* Very light green input background */
-            color: #2c5234; /* Dark green text for input */
+            background-color: #f0fff0;
+            /* Very light green input background */
+            color: #2c5234;
+            /* Dark green text for input */
         }
+
         input[type="text"]:focus {
-            border-color: #68d391; /* Brighter green focus ring */
+            border-color: #68d391;
+            /* Brighter green focus ring */
             box-shadow: 0 0 0 3px rgba(104, 211, 145, 0.25);
             outline: none;
         }
+
         button {
             padding: 0.75rem 1.25rem;
             border-radius: 0.5rem;
             font-weight: 600;
             transition: background-color 0.15s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
+
         .btn-primary {
-            background-color: #48bb78; /* Medium green */
+            background-color: #48bb78;
+            /* Medium green */
             color: white;
             padding: 10px 15px;
-            box-shadow: 0 4px 6px rgba(72, 187, 120, 0.3); /* Subtle shadow for primary button */
+            box-shadow: 0 4px 6px rgba(72, 187, 120, 0.3);
+            /* Subtle shadow for primary button */
         }
+
         .btn-primary:hover {
-            background-color: #38a169; /* Darker green on hover */
-            transform: translateY(-2px); /* Slight lift on hover */
+            background-color: #38a169;
+            /* Darker green on hover */
+            transform: translateY(-2px);
+            /* Slight lift on hover */
             box-shadow: 0 6px 8px rgba(72, 187, 120, 0.4);
         }
+
         .btn-primary:active {
-            transform: translateY(0); /* Press effect */
+            transform: translateY(0);
+            /* Press effect */
             box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);
         }
+
         .btn-secondary {
-            background-color: #68d391; /* Lighter green */
+            background-color: #68d391;
+            /* Lighter green */
             color: #2c5234;
-                        padding: 10px 15px; /* Dark green text */
+            padding: 10px 15px;
+            /* Dark green text */
             box-shadow: 0 4px 6px rgba(104, 211, 145, 0.3);
         }
+
         .btn-secondary:hover {
-            background-color: #48bb78; /* Darker lighter green on hover */
+            background-color: #48bb78;
+            /* Darker lighter green on hover */
             color: white;
         }
-        .btn-tertiary { /* Style for "Enter Manually" button */
-            background-color: #fbd38d; /* Keep a contrasting color for distinction */
-            color: #333; /* Darker text for contrast on light orange */
+
+        .btn-tertiary {
+            /* Style for "Enter Manually" button */
+            background-color: #fbd38d;
+            /* Keep a contrasting color for distinction */
+            color: #333;
+            /* Darker text for contrast on light orange */
             box-shadow: 0 4px 6px rgba(251, 211, 141, 0.3);
         }
+
         .btn-tertiary:hover {
-            background-color: #f6ad55; /* Darker orange on hover */
+            background-color: #f6ad55;
+            /* Darker orange on hover */
         }
+
         /* Floating window specific styles */
         #predictionInfoWindow {
-            background-color: rgba(60, 179, 113, 0.9); /* Forest green with transparency */
+            background-color: rgba(60, 179, 113, 0.9);
+            /* Forest green with transparency */
             color: white;
             padding: 1rem;
             border-radius: 0.75rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            width: 100%; /* Default to full width on small screens */
-            height: 400px; /* Fixed height to match map */
-            max-width: 90%; /* Responsive max-width */
-            display: none; /* Hidden by default */
+            width: 100%;
+            /* Default to full width on small screens */
+            height: 400px;
+            /* Fixed height to match map */
+            max-width: 90%;
+            /* Responsive max-width */
+            display: none;
+            /* Hidden by default */
             flex-direction: column;
             gap: 0.5rem;
-            overflow-y: auto; /* Enable scrolling for content overflow */
-            position: relative; /* Added to make absolute positioning of close button relative to this div */
+            overflow-y: auto;
+            /* Enable scrolling for content overflow */
+            position: relative;
+            /* Added to make absolute positioning of close button relative to this div */
         }
+
         #predictionInfoWindow .close-btn {
             background: none;
             border: none;
             color: white;
             font-size: 1.2rem;
             cursor: pointer;
-            position: absolute; /* Position relative to the info window itself */
+            position: absolute;
+            /* Position relative to the info window itself */
             top: 0.5rem;
             right: 0.5rem;
             padding: 0.2rem 0.5rem;
             border-radius: 0.3rem;
             transition: background-color 0.2s;
         }
+
         #predictionInfoWindow .close-btn:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
 
         /* Modal styles */
-        #confirmationModalOverlay, #mapSelectionModalOverlay, #analysisOverlay, #restoreIdModalOverlay {
+        #confirmationModalOverlay,
+        #mapSelectionModalOverlay,
+        #analysisOverlay,
+        #restoreIdModalOverlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            background-color: rgba(0, 0, 0, 0.7);
+            /* Dark overlay */
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 2000; /* Above all other content */
-            display: none; /* Hidden by default */
+            z-index: 2000;
+            /* Above all other content */
+            display: none;
+            /* Hidden by default */
         }
 
-        #confirmationModal, #mapSelectionModal, #analysisScreen, #restoreIdModal {
-            background-color: #38a169; /* Match a darker green from the theme */
+        #confirmationModal,
+        #mapSelectionModal,
+        #analysisScreen,
+        #restoreIdModal {
+            background-color: #38a169;
+            /* Match a darker green from the theme */
             color: white;
             padding: 2rem;
             border-radius: 0.75rem;
@@ -146,7 +205,10 @@
             animation: fadeIn 0.3s ease-out;
         }
 
-        #confirmationModal .close-btn, #mapSelectionModal .close-btn, #analysisScreen .close-btn, #restoreIdModal .close-btn {
+        #confirmationModal .close-btn,
+        #mapSelectionModal .close-btn,
+        #analysisScreen .close-btn,
+        #restoreIdModal .close-btn {
             background: none;
             border: none;
             color: white;
@@ -159,19 +221,32 @@
             border-radius: 0.3rem;
             transition: background-color 0.2s;
         }
-        #confirmationModal .close-btn:hover, #mapSelectionModal .close-btn:hover, #analysisScreen .close-btn:hover, #restoreIdModal .close-btn:hover {
+
+        #confirmationModal .close-btn:hover,
+        #mapSelectionModal .close-btn:hover,
+        #analysisScreen .close-btn:hover,
+        #restoreIdModal .close-btn:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Loading spinner for analysis screen */
         .loader {
-            border: 8px solid #f3f3f3; /* Light grey */
-            border-top: 8px solid #48bb78; /* Green */
+            border: 8px solid #f3f3f3;
+            /* Light grey */
+            border-top: 8px solid #48bb78;
+            /* Green */
             border-radius: 50%;
             width: 60px;
             height: 60px;
@@ -180,15 +255,22 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-green-100 to-green-200 p-4 sm:p-6 md:p-8 flex items-center justify-center min-h-screen">
+
+<body
+    class="bg-gradient-to-br from-green-100 to-green-200 p-4 sm:p-6 md:p-8 flex items-center justify-center min-h-screen">
     <div id="main-app-content" class="container mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full text-green-800">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-green-700 mb-6 text-center">
-            Farm-IQ: Empowering Smarter Farming Decisions
+            Agriva: Empowering Smarter Farming Decisions
         </h1>
 
         <div class="space-y-6">
@@ -203,15 +285,17 @@
                             Generating...
                         </p>
                         <button id="copyReferralIdBtn"
-                                class="btn-secondary p-1 rounded-md text-sm flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            class="btn-secondary p-1 rounded-md text-sm flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                fill="currentColor">
                                 <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                                <path
+                                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
                             </svg>
                         </button>
                         <!-- New button for restoring data -->
                         <button id="restoreIdBtn"
-                                class="btn-secondary p-1 rounded-md text-sm flex items-center justify-center">
+                            class="btn-secondary p-1 rounded-md text-sm flex items-center justify-center">
                             <i class="fa-solid fa-plus text-green-600"></i>
                         </button>
                     </div>
@@ -221,13 +305,12 @@
 
                 <!-- Buttons for location input choice -->
                 <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                    <button id="getGpsLocationBtn"
-                            class="btn-primary flex-grow flex items-center justify-center gap-2">
+                    <button id="getGpsLocationBtn" class="btn-primary flex-grow flex items-center justify-center gap-2">
                         <i class="fa-sharp fa-solid fa-location-dot"></i>
                         Get GPS Location
                     </button>
                     <button id="showManualCoordsBtn"
-                            class="btn-tertiary flex-grow flex items-center justify-center gap-2">
+                        class="btn-tertiary flex-grow flex items-center justify-center gap-2">
                         <i class="fa-sharp fa-solid fa-globe"></i>
                         Enter Coordinates Manually
                     </button>
@@ -238,21 +321,23 @@
                     <div class="mb-4">
                         <label for="latitude" class="block text-green-700 text-sm font-semibold mb-2">Latitude:</label>
                         <input type="text" id="latitude" placeholder="e.g., 30.0444"
-                               class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                            class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
                     </div>
                     <div class="mb-4">
-                        <label for="longitude" class="block text-green-700 text-sm font-semibold mb-2">Longitude:</label>
+                        <label for="longitude"
+                            class="block text-green-700 text-sm font-semibold mb-2">Longitude:</label>
                         <input type="text" id="longitude" placeholder="e.g., 31.2357"
-                               class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                            class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
                     </div>
                     <button id="submitManualCoordsBtn" class="btn-primary w-full">Apply Manual Coordinates</button>
                 </div>
 
                 <!-- Manual Location Text Input -->
                 <div class="mb-4">
-                    <label for="manualLocation" class="block text-green-700 text-sm font-semibold mb-2">Or type your location (e.g., "Cairo, Egypt"):</label>
+                    <label for="manualLocation" class="block text-green-700 text-sm font-semibold mb-2">Or type your
+                        location (e.g., "Cairo, Egypt"):</label>
                     <input type="text" id="manualLocation" placeholder="e.g., Nile Delta, Egypt"
-                           class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                        class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
                     <button id="searchManualLocationBtn" class="btn-primary w-full mt-3">
                         <i class="fa-sharp fa-solid fa-magnifying-glass"></i>
                         Search Location
@@ -270,7 +355,8 @@
                     <div id="map" class="rounded-lg w-full lg:w-3/5" style="height: 400px;"></div>
                     <!-- Floating window for prediction info -->
                     <div id="predictionInfoWindow" class="hidden w-full lg:w-2/5" style="height: 400px;">
-                        <button class="close-btn" onclick="document.getElementById('predictionInfoWindow').style.display='none';">&times;</button>
+                        <button class="close-btn"
+                            onclick="document.getElementById('predictionInfoWindow').style.display='none';">&times;</button>
                         <h3 class="text-lg font-bold mb-2">Predicted Underwater Source</h3>
                         <p>Type: <span id="infoType"></span></p>
                         <p>Volume: <span id="infoVolume"></span></p>
@@ -286,7 +372,7 @@
                 </div>
                 <!-- New button for satellite view and predicted underwater locations -->
                 <button id="toggleSatelliteViewBtn"
-                        class="btn-primary w-full mt-4 flex items-center justify-center gap-2">
+                    class="btn-primary w-full mt-4 flex items-center justify-center gap-2">
                     <i class="fa-sharp fa-solid fa-satellite"></i>
                     Toggle Satellite View & Underwater Predictions
                 </button>
@@ -294,7 +380,8 @@
 
             <!-- Soil Analysis Section -->
             <div class="bg-green-50 p-5 rounded-lg border border-green-200">
-                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-sharp fa-solid fa-leaf"></i> Soil Analysis</h2>
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i
+                        class="fa-sharp fa-solid fa-leaf"></i> Soil Analysis</h2>
                 <p>Detected Soil Type: <span id="soilTypeDisplay" class="font-semibold">N/A</span></p>
                 <p class="text-sm text-green-600 mt-2">
                     Soil type is determined based on satellite spectral analysis of the selected field.
@@ -302,9 +389,10 @@
                 <div class="mt-4">
                     <h3 class="text-lg font-bold text-green-700 mb-2">Closest Water Source (Predicted)</h3>
                     <p>Source Type: <span id="predictedWaterSourceType" class="font-semibold">N/A</span></p>
-                    <p>Suitable for Agriculture: <span id="predictedWaterSuitability" class="font-semibold">N/A</span></p>
+                    <p>Suitable for Agriculture: <span id="predictedWaterSuitability" class="font-semibold">N/A</span>
+                    </p>
                     <button id="goToWaterSourceBtn"
-                            class="btn-secondary w-full mt-3 flex items-center justify-center gap-2">
+                        class="btn-secondary w-full mt-3 flex items-center justify-center gap-2">
                         <i class="fa-sharp fa-solid fa-map-marker-alt"></i> View Predicted Source on Map
                     </button>
                 </div>
@@ -313,11 +401,11 @@
                     <p>Source Type: <span id="manualWaterSourceType" class="font-semibold">N/A</span></p>
                     <p>Suitable for Agriculture: <span id="manualWaterSuitability" class="font-semibold">N/A</span></p>
                     <button id="selectWaterSourceManuallyBtn"
-                            class="btn-secondary w-full mt-3 flex items-center justify-center gap-2">
+                        class="btn-secondary w-full mt-3 flex items-center justify-center gap-2">
                         <i class="fa-sharp fa-solid fa-hand-pointer"></i> Select Source Manually on Map
                     </button>
                     <button id="goToManualWaterSourceBtn"
-                            class="btn-secondary w-full mt-3 flex items-center justify-center gap-2" style="display:none;">
+                        class="btn-secondary w-full mt-3 flex items-center justify-center gap-2" style="display:none;">
                         <i class="fa-sharp fa-solid fa-map-marker-alt"></i> View Manually Selected Source
                     </button>
                 </div>
@@ -325,22 +413,26 @@
 
             <!-- Budget, Tools & Desired Crop Section -->
             <div class="bg-green-50 p-5 rounded-lg border border-green-200">
-                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-sharp fa-solid fa-dollar-sign"></i> Budget, Tools & Desired Crop</h2>
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i
+                        class="fa-sharp fa-solid fa-dollar-sign"></i> Budget, Tools & Desired Crop</h2>
                 <div class="mb-4">
-                    <label for="budget" class="block text-green-700 text-sm font-semibold mb-2">Estimated Budget ($):</label>
+                    <label for="budget" class="block text-green-700 text-sm font-semibold mb-2">Estimated Budget
+                        ($):</label>
                     <input type="text" id="budget" placeholder="e.g., 5000"
-                           class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                        class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
                 </div>
                 <div class="mb-4">
-                    <label for="availableTools" class="block text-green-700 text-sm font-semibold mb-2">Available Tools (comma-separated):</label>
+                    <label for="availableTools" class="block text-green-700 text-sm font-semibold mb-2">Available Tools
+                        (comma-separated):</label>
                     <input type="text" id="availableTools" placeholder="e.g., Tractor, Plow, Sprinkler"
-                           class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                        class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
                 </div>
                 <!-- New input for Desired Crop -->
                 <div class="mb-4">
-                    <label for="desiredCrop" class="block text-green-700 text-sm font-semibold mb-2">Desired Crop (e.g., Wheat, Corn, Tomatoes):</label>
+                    <label for="desiredCrop" class="block text-green-700 text-sm font-semibold mb-2">Desired Crop (e.g.,
+                        Wheat, Corn, Tomatoes):</label>
                     <input type="text" id="desiredCrop" placeholder="e.g., Wheat"
-                           class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
+                        class="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm">
                 </div>
                 <button id="submitBudgetToolsBtn" class="btn-primary w-full">Submit Budget, Tools & Crop</button>
             </div>
@@ -348,9 +440,10 @@
     </div>
 
     <!-- Analysis Results Page (initially hidden) -->
-    <div id="analysisResultsPage" class="container mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full text-green-800 hidden">
+    <div id="analysisResultsPage"
+        class="container mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full text-green-800 hidden">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-green-700 mb-6 text-center">
-            Farm-IQ Analysis Results
+            Agriva Analysis Results
         </h1>
         <div class="space-y-6">
             <div class="bg-green-50 p-5 rounded-lg border border-green-200">
@@ -358,7 +451,7 @@
                 <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <h2 class="text-2xl font-bold text-green-700">Field Summary</h2>
                     <button id="downloadPdfBtn"
-                            class="btn-secondary flex items-center justify-center gap-2 px-4 py-2 text-sm">
+                        class="btn-secondary flex items-center justify-center gap-2 px-4 py-2 text-sm">
                         <i class="fa-solid fa-file-pdf"></i>
                         Download PDF
                     </button>
@@ -366,8 +459,10 @@
                 <p><strong>Referral ID:</strong> <span id="resultReferralId" class="font-semibold"></span></p>
                 <p><strong>Field Location:</strong> <span id="resultFieldLocation" class="font-semibold"></span></p>
                 <p><strong>Detected Soil Type:</strong> <span id="resultSoilType" class="font-semibold"></span></p>
-                <p><strong>Predicted Water Source:</strong> <span id="resultPredictedWaterSource" class="font-semibold"></span></p>
-                <p><strong>Manual Water Source:</strong> <span id="resultManualWaterSource" class="font-semibold"></span></p>
+                <p><strong>Predicted Water Source:</strong> <span id="resultPredictedWaterSource"
+                        class="font-semibold"></span></p>
+                <p><strong>Manual Water Source:</strong> <span id="resultManualWaterSource"
+                        class="font-semibold"></span></p>
                 <p><strong>Estimated Budget:</strong> <span id="resultBudget" class="font-semibold"></span></p>
                 <p><strong>Available Tools:</strong> <span id="resultTools" class="font-semibold"></span></p>
                 <p><strong>Desired Crop:</strong> <span id="resultDesiredCrop" class="font-semibold"></span></p>
@@ -375,28 +470,40 @@
 
             <div class="bg-green-50 p-5 rounded-lg border border-green-200">
                 <h2 class="text-2xl font-bold text-green-700 mb-4">Satellite Data & Forecasts</h2>
-                <p><i class="fa-solid fa-cloud-showers-heavy mr-2"></i><strong>Rainfall Prediction:</strong> <span id="resultRainfall" class="font-semibold"></span></p>
-                <p><i class="fa-solid fa-water mr-2"></i><strong>Soil Moisture Index:</strong> <span id="resultSoilMoisture" class="font-semibold"></span></p>
-                <p><i class="fa-solid fa-temperature-half mr-2"></i><strong>Temperature:</strong> <span id="resultTemperature" class="font-semibold"></span></p>
-                <p><i class="fa-solid fa-calendar-alt mr-2"></i><strong>Seasonal Forecast:</strong> <span id="resultSeasonalForecast" class="font-semibold"></span></p>
-                <p><i class="fa-solid fa-mountain mr-2"></i><strong>Land Elevation:</strong> <span id="resultElevation" class="font-semibold"></span></p>
-                <p><i class="fa-solid fa-angle-double-up mr-2"></i><strong>Slope Data:</strong> <span id="resultSlope" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-cloud-showers-heavy mr-2"></i><strong>Rainfall Prediction:</strong> <span
+                        id="resultRainfall" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-water mr-2"></i><strong>Soil Moisture Index:</strong> <span
+                        id="resultSoilMoisture" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-temperature-half mr-2"></i><strong>Temperature:</strong> <span
+                        id="resultTemperature" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-calendar-alt mr-2"></i><strong>Seasonal Forecast:</strong> <span
+                        id="resultSeasonalForecast" class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-mountain mr-2"></i><strong>Land Elevation:</strong> <span id="resultElevation"
+                        class="font-semibold"></span></p>
+                <p><i class="fa-solid fa-angle-double-up mr-2"></i><strong>Slope Data:</strong> <span id="resultSlope"
+                        class="font-semibold"></span></p>
             </div>
 
             <!-- New section for Climate Risk Alerts - Updated with icons -->
             <div class="bg-green-50 p-5 rounded-lg border border-green-200">
-                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Climate Risk Alerts</h2>
-                <p><i class="fa-solid fa-house-flood-water mr-2"></i><strong>Flood Risk:</strong> <span id="resultFloodRisk" class="font-semibold">N/A</span></p>
-                <p><i class="fa-solid fa-sun-plant-wilt mr-2"></i><strong>Drought Risk:</strong> <span id="resultDroughtRisk" class="font-semibold">N/A</span></p>
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i
+                        class="fa-solid fa-triangle-exclamation"></i> Climate Risk Alerts</h2>
+                <p><i class="fa-solid fa-house-flood-water mr-2"></i><strong>Flood Risk:</strong> <span
+                        id="resultFloodRisk" class="font-semibold">N/A</span></p>
+                <p><i class="fa-solid fa-sun-plant-wilt mr-2"></i><strong>Drought Risk:</strong> <span
+                        id="resultDroughtRisk" class="font-semibold">N/A</span></p>
                 <p class="text-sm text-green-600 mt-2">
-                    These alerts are based on simulated climate models and satellite data for your selected field and crop.
+                    These alerts are based on simulated climate models and satellite data for your selected field and
+                    crop.
                 </p>
             </div>
 
             <!-- Section for Desired Crop Suitability Analysis -->
             <div class="bg-green-50 p-5 rounded-lg border border-green-200">
-                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-seedling"></i> Desired Crop Suitability Analysis</h2>
-                <p><strong>Possibility of Growing <span id="resultCropName" class="font-semibold"></span>:</strong> <span id="resultCropSuitability" class="font-semibold"></span></p>
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i
+                        class="fa-solid fa-seedling"></i> Desired Crop Suitability Analysis</h2>
+                <p><strong>Possibility of Growing <span id="resultCropName" class="font-semibold"></span>:</strong>
+                    <span id="resultCropSuitability" class="font-semibold"></span></p>
                 <p class="mt-2"><strong>Reasons:</strong></p>
                 <ul id="resultCropSuitabilityReasons" class="list-disc list-inside ml-4 text-green-600">
                     <!-- Reasons will be populated here -->
@@ -405,8 +512,10 @@
 
             <!-- New section for Best Crop Recommendation -->
             <div class="bg-green-50 p-5 rounded-lg border border-green-200">
-                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-hand-holding-seedling"></i> Best Crop Recommendation</h2>
-                <p><strong>Recommended Crop:</strong> <span id="resultBestCropRecommendation" class="font-semibold">N/A</span></p>
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i
+                        class="fa-solid fa-hand-holding-seedling"></i> Best Crop Recommendation</h2>
+                <p><strong>Recommended Crop:</strong> <span id="resultBestCropRecommendation"
+                        class="font-semibold">N/A</span></p>
                 <p class="mt-2"><strong>Recommendation Reasons:</strong></p>
                 <ul id="resultBestCropRecommendationReasons" class="list-disc list-inside ml-4 text-green-600">
                     <!-- Reasons will be populated here -->
@@ -415,8 +524,10 @@
 
             <!-- New section for Crop Rotation Planner -->
             <div class="bg-green-50 p-5 rounded-lg border border-green-200">
-                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-rotate mr-2"></i> Crop Rotation Planner</h2>
-                <p><strong>Rotation Strategy:</strong> <span id="resultRotationStrategy" class="font-semibold">N/A</span></p>
+                <h2 class="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2"><i
+                        class="fa-solid fa-rotate mr-2"></i> Crop Rotation Planner</h2>
+                <p><strong>Rotation Strategy:</strong> <span id="resultRotationStrategy"
+                        class="font-semibold">N/A</span></p>
                 <p class="mt-2"><strong>Recommended Crops for Rotation:</strong></p>
                 <ul id="resultRotationCrops" class="list-disc list-inside ml-4 text-green-600">
                     <!-- Rotation crops will be populated here -->
@@ -434,8 +545,10 @@
                 <h2 class="text-2xl font-bold text-green-700 mb-4">Crop Planning Recommendations</h2>
                 <p><strong>Ideal Soil:</strong> <span id="resultIdealSoil" class="font-semibold"></span></p>
                 <p><strong>Ideal Water Source:</strong> <span id="resultIdealWater" class="font-semibold"></span></p>
-                <p><strong>Ideal Temperature Range:</strong> <span id="resultIdealTemperature" class="font-semibold"></span></p>
-                <p><strong>Optimal Growing Season:</strong> <span id="resultGrowingSeason" class="font-semibold"></span></p>
+                <p><strong>Ideal Temperature Range:</strong> <span id="resultIdealTemperature"
+                        class="font-semibold"></span></p>
+                <p><strong>Optimal Growing Season:</strong> <span id="resultGrowingSeason" class="font-semibold"></span>
+                </p>
                 <p><strong>Expected Yield:</strong> <span id="resultExpectedYield" class="font-semibold"></span></p>
                 <p><strong>Required Inputs:</strong> <span id="resultRequiredInputs" class="font-semibold"></span></p>
             </div>
@@ -446,10 +559,13 @@
     <!-- Confirmation Modal -->
     <div id="confirmationModalOverlay" class="hidden">
         <div id="confirmationModal">
-            <button class="close-btn" onclick="document.getElementById('confirmationModalOverlay').style.display='none';">&times;</button>
+            <button class="close-btn"
+                onclick="document.getElementById('confirmationModalOverlay').style.display='none';">&times;</button>
             <h3 class="text-2xl font-bold mb-4" id="modalTitle">Submission Summary</h3>
-            <p class="text-lg mb-2" id="modalPredictedLat" style="display: none;">Predicted Latitude: <span class="font-semibold"></span></p>
-            <p class="text-lg mb-4" id="modalPredictedLng" style="display: none;">Predicted Longitude: <span class="font-semibold"></span></p>
+            <p class="text-lg mb-2" id="modalPredictedLat" style="display: none;">Predicted Latitude: <span
+                    class="font-semibold"></span></p>
+            <p class="text-lg mb-4" id="modalPredictedLng" style="display: none;">Predicted Longitude: <span
+                    class="font-semibold"></span></p>
             <p class="text-sm text-green-200" id="modalMessage">
                 Your data has been received. We will process this information to provide tailored recommendations.
             </p>
@@ -470,18 +586,20 @@
                 A marker will be placed at your selected location.
             </p>
             <button onclick="document.getElementById('mapSelectionModalOverlay').style.display='none';"
-                    class="btn-primary w-full mt-4">Okay</button>
+                class="btn-primary w-full mt-4">Okay</button>
         </div>
     </div>
 
     <!-- Restore ID Modal -->
     <div id="restoreIdModalOverlay" class="hidden">
-        <div id="restoreIdModal" class="bg-green-700 text-white p-6 rounded-xl shadow-lg w-90 max-w-sm relative text-center">
-            <button class="close-btn" onclick="document.getElementById('restoreIdModalOverlay').style.display='none';">&times;</button>
+        <div id="restoreIdModal"
+            class="bg-green-700 text-white p-6 rounded-xl shadow-lg w-90 max-w-sm relative text-center">
+            <button class="close-btn"
+                onclick="document.getElementById('restoreIdModalOverlay').style.display='none';">&times;</button>
             <h3 class="text-2xl font-bold mb-4">Restore Field Data</h3>
             <p class="text-lg mb-4">Enter your field's Referral ID:</p>
             <input type="text" id="restoreFieldIdInput" placeholder="e.g., AGRO-ABC12345"
-                   class="w-full rounded-lg border-green-500 focus:ring-green-300 focus:border-green-300 shadow-sm mb-4">
+                class="w-full rounded-lg border-green-500 focus:ring-green-300 focus:border-green-300 shadow-sm mb-4">
             <button id="submitRestoreIdBtn" class="btn-primary w-full">Restore Data</button>
             <p id="restoreStatus" class="text-sm text-green-200 mt-2 text-center"></p>
         </div>
@@ -498,8 +616,7 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- jsPDF CDN for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Firebase SDKs -->
@@ -516,7 +633,7 @@
 
         // Ensure __app_id and __firebase_config are defined in the environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        
+
         // Initialize firebaseConfig with default empty values for all expected fields
         let firebaseConfig = {
             apiKey: "",
@@ -546,7 +663,7 @@
                     firebaseConfig.projectId = 'agroai-default-project';
                     console.warn("Firebase projectId was not provided in __firebase_config. Using default 'agroai-default-project'.");
                 }
-                
+
                 // If apiKey is still missing after parsing/merging, set it to empty string.
                 // NOTE: For Firebase SDK's initializeApp, an empty API key might be considered invalid.
                 // The Canvas environment is expected to inject a valid API key when it's an empty string.
@@ -611,14 +728,14 @@
             predictedUnderwaterLayer = L.layerGroup().addTo(map); // Add to map initially, but it will be empty
 
             // Add event listener for map movement
-            map.on('moveend', function() {
+            map.on('moveend', function () {
                 if (isSatelliteView) {
                     addPredictedUnderwaterLocations();
                 }
             });
 
             // Add click listener for manual water source selection
-            map.on('click', function(e) {
+            map.on('click', function (e) {
                 if (isManualWaterSourceSelectionMode) {
                     selectManualWaterSource(e.latlng.lat, e.latlng.lng);
                 }
@@ -676,7 +793,7 @@
                     },
                     (error) => {
                         let errorMessage = 'Error getting location.';
-                        switch(error.code) {
+                        switch (error.code) {
                             case error.PERMISSION_DENIED:
                                 errorMessage = "Location access denied. Please enable location services in your browser settings.";
                                 break;
@@ -899,7 +1016,7 @@
                         });
 
                         // Attach click event listener to show the info window
-                        circle.on('click', function(e) {
+                        circle.on('click', function (e) {
                             showInfoWindow(predictionData);
                         });
 
@@ -922,7 +1039,7 @@
                 });
 
                 // Attach click event listener to show the info window
-                circle.on('click', function(e) {
+                circle.on('click', function (e) {
                     showInfoWindow(predictionData);
                 });
 
@@ -1010,7 +1127,7 @@
         function enableManualWaterSourceSelection() {
             isManualWaterSourceSelectionMode = true;
             map.getContainer().style.cursor = 'crosshair'; // Change cursor to indicate selection mode
-            
+
             // Show the specific map selection modal
             document.getElementById('mapSelectionModalOverlay').style.display = 'flex';
         }
@@ -1149,7 +1266,7 @@
                 reasons.push(...desiredCropSuitability.reasons);
                 reasons.push("Considering other options might yield better results.");
             }
-            
+
             // Fallback to general recommendations if desired crop is not suitable or not provided
             if (recommendedCrop === "General Crop" || (fieldData.desiredCrop && desiredCropSuitability.suitability === "Not Recommended")) {
                 if (fieldData.soilType === "Loamy" && fieldData.predictedWaterSource.suitability === "Highly Suitable") {
@@ -1373,7 +1490,7 @@
             const sectionSpacing = 10;
 
             doc.setFontSize(18);
-            doc.text("Farm-IQ: Field Analysis Report", margin, yOffset);
+            doc.text("Agriva: Field Analysis Report", margin, yOffset);
             yOffset += sectionSpacing;
 
             doc.setFontSize(14);
@@ -1539,7 +1656,7 @@
                 modalOverlay.style.display = 'flex';
                 return; // Stop the function if no data is provided
             }
-            
+
             // Show analysis loading screen
             document.getElementById('analysisOverlay').style.display = 'flex';
 
@@ -1602,7 +1719,7 @@
                     requiredInputs: ["Fertilizers", "Pesticides", "Improved Seeds", "Irrigation System"][Math.floor(Math.random() * 4)]
                 }
             };
-            
+
             // Determine best crop recommendation
             const bestCropRecommendation = await determineBestCropRecommendation(fieldData, cropSuitability); // Pass cropSuitability
             fieldData.bestCropRecommendation = bestCropRecommendation; // Add to fieldData
@@ -1630,7 +1747,7 @@
 
 
         // Event Listeners
-        window.onload = async function() { // Made window.onload async
+        window.onload = async function () { // Made window.onload async
             await initializeFirebase(); // Await Firebase initialization
             initMap();
             generateReferralId(); // Generate initial ID on load
@@ -1771,4 +1888,5 @@
         }
     </script>
 </body>
+
 </html>
