@@ -92,6 +92,10 @@ export interface WeatherResponse {
   humidity: number;
   rainfall: number;
   description: string;
+  soilMoisture?: number;
+  elevation?: number;
+  seasonalForecast?: string;
+  slopeData?: number;
 }
 
 export interface SoilResponse {

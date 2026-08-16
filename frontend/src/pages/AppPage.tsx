@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFieldData } from '../context/FieldDataContext';
 import MapView from '../components/MapView';
 import BudgetToolsForm from '../components/BudgetToolsForm';
@@ -19,6 +19,9 @@ export default function AppPage() {
   const [latInput, setLatInput] = useState('');
   const [lngInput, setLngInput] = useState('');
   const [manualLocationInput, setManualLocationInput] = useState('');
+  const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { referralId, generateReferralId } = useFieldData();
   const { getLocation } = useGeolocation();
@@ -87,6 +90,48 @@ export default function AppPage() {
     }
   };
 
+  const handleManualLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setManualLocationInput(val);
+    
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    
+    if (val.trim().length < 3) {
+      setLocationSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const results = await searchLocation(val);
+        if (results && results.length > 0) {
+          setLocationSuggestions(results);
+          setShowSuggestions(true);
+        } else {
+          setLocationSuggestions([]);
+        }
+      } catch (error) {
+        console.error('Error fetching location suggestions:', error);
+      }
+    }, 200); // 200ms debounce
+  };
+
+  const handleSelectSuggestion = (suggestion: any) => {
+    setManualLocationInput(suggestion.display_name);
+    setShowSuggestions(false);
+    
+    const lat = suggestion.lat;
+    const lng = suggestion.lon;
+    
+    setLatInput(lat.toFixed(6));
+    setLngInput(lng.toFixed(6));
+    callUpdateMap(lat, lng);
+    
+    setLocationStatus(`Location found: ${suggestion.display_name}`);
+    setLocationStatusClass('text-sm text-green-500 mt-2 text-center');
+  };
+
   const handleSearchLocation = async () => {
     if (!manualLocationInput) {
       setLocationStatus('Please enter a location name.');
@@ -94,45 +139,23 @@ export default function AppPage() {
       return;
     }
 
+    // If we have suggestions and user clicks search, just use the first one
+    if (locationSuggestions.length > 0) {
+      handleSelectSuggestion(locationSuggestions[0]);
+      return;
+    }
+
     setLocationStatus('Searching for location...');
     setLocationStatusClass('text-sm text-green-600 mt-2 text-center');
 
     try {
-      // Try backend first, fall back to direct Nominatim
-      let lat: number, lng: number, displayName: string;
-      try {
-        const results = await searchLocation(manualLocationInput);
-        if (results && results.length > 0) {
-          lat = results[0].lat;
-          lng = results[0].lon;
-          displayName = results[0].display_name;
-        } else {
-          throw new Error('No results');
-        }
-      } catch {
-        // Fallback to direct Nominatim
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-            manualLocationInput
-          )}&format=json&limit=1`
-        );
-        const data = await response.json();
-        if (data && data.length > 0) {
-          lat = parseFloat(data[0].lat);
-          lng = parseFloat(data[0].lon);
-          displayName = data[0].display_name;
-        } else {
-          setLocationStatus('Location not found. Please try a different name.');
-          setLocationStatusClass('text-sm text-red-500 mt-2 text-center');
-          return;
-        }
+      const results = await searchLocation(manualLocationInput);
+      if (results && results.length > 0) {
+        handleSelectSuggestion(results[0]);
+      } else {
+        setLocationStatus('Location not found. Please try a different name.');
+        setLocationStatusClass('text-sm text-red-500 mt-2 text-center');
       }
-
-      setLatInput(lat!.toFixed(6));
-      setLngInput(lng!.toFixed(6));
-      callUpdateMap(lat!, lng!);
-      setLocationStatus(`Location found: ${displayName!}`);
-      setLocationStatusClass('text-sm text-green-500 mt-2 text-center');
     } catch (error) {
       console.error('Error searching location:', error);
       setLocationStatus('Error searching location. Please try again.');
@@ -268,7 +291,7 @@ export default function AppPage() {
             )}
 
             {/* Manual Location Text Input */}
-            <div className="mb-4">
+            <div className="mb-4 relative">
               <label htmlFor="manualLocation" className="block text-green-700 text-sm font-semibold mb-2">
                 Or type your location (e.g., "Cairo, Egypt"):
               </label>
@@ -277,9 +300,32 @@ export default function AppPage() {
                 id="manualLocation"
                 placeholder="e.g., Nile Delta, Egypt"
                 value={manualLocationInput}
-                onChange={(e) => setManualLocationInput(e.target.value)}
+                onChange={handleManualLocationChange}
+                onFocus={() => {
+                  if (locationSuggestions.length > 0) setShowSuggestions(true);
+                }}
+                onBlur={() => {
+                  // Delay hiding suggestions to allow click events to fire
+                  setTimeout(() => setShowSuggestions(false), 200);
+                }}
                 className="w-full rounded-lg border-green-200 focus:ring-green-300 focus:border-green-300 shadow-sm"
               />
+              
+              {/* Autocomplete Dropdown */}
+              {showSuggestions && locationSuggestions.length > 0 && (
+                <ul className="absolute z-50 w-full bg-white border border-green-200 mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {locationSuggestions.map((sug, index) => (
+                    <li 
+                      key={index} 
+                      className="px-4 py-2 hover:bg-green-50 cursor-pointer border-b border-gray-100 text-sm text-gray-700"
+                      onClick={() => handleSelectSuggestion(sug)}
+                    >
+                      {sug.display_name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
               <button
                 onClick={handleSearchLocation}
                 className="btn-primary w-full mt-3"

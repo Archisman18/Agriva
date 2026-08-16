@@ -9,20 +9,71 @@ async def get_soil(
     lat: float = Query(..., description="Latitude"),
     lng: float = Query(..., description="Longitude")
 ):
-    # In a real scenario, this would proxy to SoilGrids API.
-    # ISRIC SoilGrids REST API can be complex to integrate for simple lat/lng to soil type quickly.
-    # We'll simulate a realistic response based on coordinates to represent the integration.
-    
-    # Simple hash of lat/lng to keep results consistent for the same location
-    seed = int(abs(lat) * 100 + abs(lng) * 100)
-    random.seed(seed)
-    
-    soil_types = ['Loamy', 'Sandy', 'Clayey', 'Silty', 'Peaty', 'Chalky']
-    
-    return {
-        "soilType": random.choice(soil_types),
-        "ph": round(random.uniform(5.5, 8.5), 1),
-        "nitrogen": round(random.uniform(10, 50), 1),
-        "phosphorus": round(random.uniform(5, 30), 1),
-        "potassium": round(random.uniform(50, 200), 1)
+    url = "https://rest.isric.org/soilgrids/v2.0/properties/query"
+    params = {
+        "lat": lat,
+        "lon": lng,
+        "property": ["phh2o", "nitrogen", "sand", "silt", "clay"],
+        "depth": "0-5cm",
+        "value": "mean"
     }
+    
+    # Defaults in case of missing data (e.g. over ocean)
+    soil_data = {
+        "soilType": "Unknown",
+        "ph": 7.0,
+        "nitrogen": 20.0,
+        "phosphorus": 15.0, # Not reliably in soilgrids default, keep mock
+        "potassium": 100.0  # Not reliably in soilgrids default, keep mock
+    }
+    
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(url, params=params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                layers = data.get("properties", {}).get("layers", [])
+                
+                extracted = {}
+                for layer in layers:
+                    name = layer.get("name")
+                    depths = layer.get("depths", [])
+                    if depths and len(depths) > 0:
+                        val = depths[0].get("values", {}).get("mean")
+                        if val is not None:
+                            extracted[name] = val
+                
+                # Convert phh2o (pH * 10) to actual pH
+                if "phh2o" in extracted:
+                    soil_data["ph"] = round(extracted["phh2o"] / 10.0, 1)
+                
+                if "nitrogen" in extracted:
+                    # cg/kg to reasonable range
+                    soil_data["nitrogen"] = round(extracted["nitrogen"] / 10.0, 1)
+                    
+                # Determine texture class based on sand/silt/clay
+                sand = extracted.get("sand", 0)
+                silt = extracted.get("silt", 0)
+                clay = extracted.get("clay", 0)
+                
+                total = sand + silt + clay
+                if total > 0:
+                    sand_pct = sand / total
+                    clay_pct = clay / total
+                    
+                    if clay_pct > 0.4:
+                        soil_data["soilType"] = "Clayey"
+                    elif sand_pct > 0.5:
+                        soil_data["soilType"] = "Sandy"
+                    elif clay_pct > 0.2 and sand_pct > 0.2:
+                        soil_data["soilType"] = "Loamy"
+                    else:
+                        soil_data["soilType"] = "Silty"
+                
+    except Exception as e:
+        print(f"SoilGrids API Error: {e}")
+        # Return defaults on error rather than crashing the flow
+        pass
+        
+    return soil_data

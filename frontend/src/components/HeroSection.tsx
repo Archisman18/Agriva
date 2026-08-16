@@ -31,7 +31,7 @@ export default function HeroSection() {
           </a>
         </div>
       </div>
-      <video src="/assets/Background Video.mp4" muted loop autoPlay></video>
+      <video src="/assets/background.mp4" muted loop autoPlay playsInline></video>
     </section>
   );
 }

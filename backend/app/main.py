@@ -3,8 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import connect_mongo, disconnect_mongo, connect_postgres, disconnect_postgres
-from app.routes import field_data, geocoding, weather, soil, predict, risk, rotation, advisor
-
+from app.routes import field_data, geocoding, weather, soil, predict, risk, rotation, advisor, analyze, water
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,10 +37,12 @@ app.include_router(field_data.router, prefix="/api/field-data", tags=["Field Dat
 app.include_router(geocoding.router, prefix="/api/geocoding", tags=["Geocoding"])
 app.include_router(weather.router, prefix="/api/weather", tags=["Weather"])
 app.include_router(soil.router, prefix="/api/soil", tags=["Soil"])
+app.include_router(water.router, prefix="/api/water", tags=["Water"])
 app.include_router(predict.router, prefix="/api/predict", tags=["ML Predictions"])
 app.include_router(risk.router, prefix="/api/risk", tags=["Climate Risk"])
 app.include_router(rotation.router, prefix="/api/rotation", tags=["Crop Rotation"])
 app.include_router(advisor.router, prefix="/api/advisor", tags=["Gemini Advisor"])
+app.include_router(analyze.router, prefix="/api/analyze", tags=["AI Analysis"])
 
 
 @app.get("/api/health")

@@ -50,6 +50,13 @@ export async function getSoilData(lat: number, lng: number): Promise<SoilRespons
   return response.data;
 }
 
+// ===== Water =====
+
+export async function getWaterSources(lat: number, lng: number): Promise<any> {
+  const response = await api.get('/water', { params: { lat, lng } });
+  return response.data;
+}
+
 // ===== ML Predictions =====
 
 export async function predictCrop(data: {
@@ -88,6 +95,11 @@ export async function getCropRotation(data: {
 }
 
 // ===== Gemini AI Advisor =====
+
+export async function analyzeField(data: any): Promise<any> {
+  const response = await api.post('/analyze', data);
+  return response.data;
+}
 
 export async function chatWithAdvisor(
   message: string,

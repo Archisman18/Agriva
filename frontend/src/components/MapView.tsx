@@ -121,18 +121,19 @@ export default function MapView() {
   );
 
   const determinePredictedWaterSource = useCallback(
-    (lat: number, lng: number) => {
-      const waterSourceTypes = ['River', 'Lake', 'Underground Aquifer', 'Spring'];
-      const suitabilityOptions = ['Highly Suitable', 'Moderately Suitable', 'Not Recommended'];
-
-      setPredictedWaterSource({
-        type: waterSourceTypes[Math.floor(Math.random() * waterSourceTypes.length)],
-        suitability: suitabilityOptions[Math.floor(Math.random() * suitabilityOptions.length)],
-        coords: {
-          lat: lat + (Math.random() - 0.5) * 0.1,
-          lng: lng + (Math.random() - 0.5) * 0.1,
-        },
-      });
+    async (lat: number, lng: number) => {
+      try {
+        const { getWaterSources } = await import('../services/api');
+        const data = await getWaterSources(lat, lng);
+        if (data && data.closest) {
+          setPredictedWaterSource(data.closest);
+          
+          // Store hotspots for map display later
+          (window as any).__agriva_water_hotspots = data.hotspots;
+        }
+      } catch (error) {
+        console.error('Failed to get water sources', error);
+      }
     },
     [setPredictedWaterSource]
   );
@@ -162,68 +163,29 @@ export default function MapView() {
     [setFieldLocation, determineSoilType, determinePredictedWaterSource, generateReferralId]
   );
 
-  const generatePredictionData = (): PredictionData => {
-    const types = [
-      'Freshwater Aquifer',
-      'Brackish Water Reservoir',
-      'Mineral-Rich Source',
-      'Deep Underground Lake',
-    ];
-    const qualities = ['High', 'Medium', 'Low'];
-    return {
-      type: types[Math.floor(Math.random() * types.length)],
-      volume: `${(Math.random() * 10000 + 1000).toFixed(0)} cubic meters`,
-      quality: qualities[Math.floor(Math.random() * qualities.length)],
-      confidence: `${(Math.random() * 30 + 70).toFixed(0)}%`,
-      depth: `${(Math.random() * 200 + 20).toFixed(0)} meters`,
-      flowRate: `${(Math.random() * 500 + 50).toFixed(0)} liters/hour`,
-      timeToExtract: `${(Math.random() * 60 + 10).toFixed(0)} days`,
-    };
-  };
-
   const addPredictedUnderwaterLocations = () => {
     const map = mapRef.current;
     const layer = underwaterLayerRef.current;
     if (!map || !layer) return;
 
     layer.clearLayers();
-    const bounds = map.getBounds();
-    const sw = bounds.getSouthWest();
-    const ne = bounds.getNorthEast();
+    
+    const hotspots = (window as any).__agriva_water_hotspots || [];
 
-    const hotspots = [
-      [sw.lat + (ne.lat - sw.lat) * 0.2, sw.lng + (ne.lng - sw.lng) * 0.3],
-      [sw.lat + (ne.lat - sw.lat) * 0.7, sw.lng + (ne.lng - sw.lng) * 0.6],
-      [sw.lat + (ne.lat - sw.lat) * 0.4, sw.lng + (ne.lng - sw.lng) * 0.8],
-    ];
-
-    const addPoint = (lat: number, lng: number) => {
-      const data = generatePredictionData();
-      const circle = L.circleMarker([lat, lng], {
+    const addPoint = (spot: any) => {
+      const circle = L.circleMarker([spot.coords.lat, spot.coords.lng], {
         color: '#00FFFF',
         fillColor: '#00FFFF',
         fillOpacity: 0.5,
         radius: 8,
       });
-      circle.on('click', () => setPredictionInfo(data));
+      circle.on('click', () => setPredictionInfo(spot));
       layer.addLayer(circle);
     };
 
-    hotspots.forEach(([hLat, hLng]) => {
-      for (let i = 0; i < 10; i++) {
-        const lat = hLat + (Math.random() - 0.5) * 0.05;
-        const lng = hLng + (Math.random() - 0.5) * 0.05;
-        if (lat >= sw.lat && lat <= ne.lat && lng >= sw.lng && lng <= ne.lng) {
-          addPoint(lat, lng);
-        }
-      }
+    hotspots.forEach((spot: any) => {
+      addPoint(spot);
     });
-
-    for (let i = 0; i < 20; i++) {
-      const lat = sw.lat + Math.random() * (ne.lat - sw.lat);
-      const lng = sw.lng + Math.random() * (ne.lng - sw.lng);
-      addPoint(lat, lng);
-    }
   };
 
   const selectManualWaterSource = (lat: number, lng: number) => {
