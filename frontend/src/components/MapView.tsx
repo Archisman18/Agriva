@@ -27,27 +27,26 @@ export default function MapView() {
     setManualWaterSource,
     setSoilType,
     generateReferralId,
+    soilType
   } = useFieldData();
 
-  // Initialize map
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
-      const map = L.map(mapContainerRef.current).setView([0, 0], 2);
+      const map = L.map(mapContainerRef.current, { zoomControl: false }).setView([20, 0], 3);
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
       mapRef.current = map;
 
       osmLayerRef.current = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          attribution: '&copy; OpenStreetMap',
         }
       ).addTo(map);
 
       satelliteLayerRef.current = L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         {
-          attribution:
-            'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, swisstopo, and the GIS User Community',
+          attribution: '&copy; Esri',
         }
       );
 
@@ -66,10 +65,8 @@ export default function MapView() {
         mapRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Handle manual selection mode map click
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -84,10 +81,8 @@ export default function MapView() {
     return () => {
       map.off('click', handleClick);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isManualSelectionMode]);
 
-  // Satellite view moveend handler
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -102,7 +97,6 @@ export default function MapView() {
     return () => {
       map.off('moveend', handleMoveEnd);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSatelliteView]);
 
   const determineSoilType = useCallback(
@@ -127,8 +121,6 @@ export default function MapView() {
         const data = await getWaterSources(lat, lng);
         if (data && data.closest) {
           setPredictedWaterSource(data.closest);
-          
-          // Store hotspots for map display later
           (window as any).__agriva_water_hotspots = data.hotspots;
         }
       } catch (error) {
@@ -152,7 +144,7 @@ export default function MapView() {
         fieldMarkerRef.current = L.marker(newLatLng).addTo(map);
       }
       fieldMarkerRef.current
-        .bindPopup(`Field Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+        .bindPopup(`<b>Field Location</b><br>${lat.toFixed(4)}, ${lng.toFixed(4)}`)
         .openPopup();
 
       setFieldLocation({ lat, lng });
@@ -172,7 +164,7 @@ export default function MapView() {
     
     const hotspots = (window as any).__agriva_water_hotspots || [];
 
-    const addPoint = (spot: any) => {
+    hotspots.forEach((spot: any) => {
       const circle = L.circleMarker([spot.coords.lat, spot.coords.lng], {
         color: '#00FFFF',
         fillColor: '#00FFFF',
@@ -181,10 +173,6 @@ export default function MapView() {
       });
       circle.on('click', () => setPredictionInfo(spot));
       layer.addLayer(circle);
-    };
-
-    hotspots.forEach((spot: any) => {
-      addPoint(spot);
     });
   };
 
@@ -213,13 +201,13 @@ export default function MapView() {
       manualWaterMarkerRef.current = L.marker([lat, lng], {
         icon: L.divIcon({
           className: 'custom-div-icon',
-          html: '<i class="fa-solid fa-droplet text-green-400 text-2xl"></i>',
+          html: '<i class="fa-solid fa-droplet text-blue-500 text-3xl" style="filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.3));"></i>',
           iconSize: [30, 30],
           iconAnchor: [15, 30],
         }),
       }).addTo(mapRef.current!);
     }
-    manualWaterMarkerRef.current.bindPopup('Manually Selected Water Source').openPopup();
+    manualWaterMarkerRef.current.bindPopup('<b>Manually Selected Source</b>').openPopup();
     setShowMapSelectionModal(false);
   };
 
@@ -258,13 +246,13 @@ export default function MapView() {
         predictedWaterMarkerRef.current = L.marker([source.coords.lat, source.coords.lng], {
           icon: L.divIcon({
             className: 'custom-div-icon',
-            html: '<i class="fa-solid fa-droplet text-green-400 text-2xl"></i>',
+            html: '<i class="fa-solid fa-droplet text-blue-500 text-3xl" style="filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.3));"></i>',
             iconSize: [30, 30],
             iconAnchor: [15, 30],
           }),
         }).addTo(map);
       }
-      predictedWaterMarkerRef.current.bindPopup('Predicted Water Source').openPopup();
+      predictedWaterMarkerRef.current.bindPopup('<b>Predicted Water Source</b>').openPopup();
     }
   };
 
@@ -276,7 +264,6 @@ export default function MapView() {
     setShowMapSelectionModal(true);
   };
 
-  // Expose updateMap for parent component
   useEffect(() => {
     (window as unknown as Record<string, unknown>).__agriva_updateMap = updateMap;
     return () => {
@@ -286,122 +273,107 @@ export default function MapView() {
 
   return (
     <>
-      {/* Map Display */}
-      <div className="bg-green-50 p-5 rounded-lg border border-green-200">
-        <h2 className="text-2xl font-bold text-green-700 mb-4">Field Location Map</h2>
-        <div className="flex flex-col lg:flex-row gap-4 items-start mb-4">
-          <div id="map" ref={mapContainerRef} className="rounded-lg w-full lg:w-3/5"></div>
-          {/* Prediction Info Window */}
-          {predictionInfo && (
-            <div
-              id="predictionInfoWindow"
-              className="w-full lg:w-2/5"
-              style={{ display: 'flex' }}
-            >
-              <button
-                className="close-btn"
-                onClick={() => setPredictionInfo(null)}
-              >
-                &times;
-              </button>
-              <h3 className="text-lg font-bold mb-2">Predicted Underwater Source</h3>
-              <p>Type: <span>{predictionInfo.type}</span></p>
-              <p>Volume: <span>{predictionInfo.volume}</span></p>
-              <p>Quality: <span>{predictionInfo.quality}</span></p>
-              <p>Confidence: <span>{predictionInfo.confidence}</span></p>
-              <p>Depth: <span>{predictionInfo.depth}</span></p>
-              <p>Flow Rate: <span>{predictionInfo.flowRate}</span></p>
-              <p>Time to Extract: <span>{predictionInfo.timeToExtract}</span></p>
-              <p className="text-sm text-green-200 mt-2">
-                This is a simulated prediction based on satellite data analysis.
-              </p>
-            </div>
-          )}
-        </div>
+      <div id="map" ref={mapContainerRef}></div>
+
+      {/* Top Left Overlay: Layer Controls */}
+      <div className="absolute top-4 left-4 z-[400] flex flex-col gap-2">
         <button
           onClick={toggleSatelliteView}
-          className="btn-primary w-full mt-4 flex items-center justify-center gap-2"
+          className="bg-white/90 backdrop-blur-md p-3 rounded-xl shadow-lg border border-slate-200 text-slate-700 hover:text-emerald-600 transition-colors flex items-center justify-center"
+          title="Toggle Satellite View"
         >
-          <i className="fa-sharp fa-solid fa-satellite"></i>
-          Toggle Satellite View &amp; Underwater Predictions
+          <i className={`fa-sharp fa-solid ${isSatelliteView ? 'fa-map' : 'fa-satellite'} text-xl`}></i>
         </button>
       </div>
 
-      {/* Soil Analysis Section */}
-      <div className="bg-green-50 p-5 rounded-lg border border-green-200">
-        <h2 className="text-2xl font-bold text-green-700 mb-4 flex items-center gap-2">
-          <i className="fa-sharp fa-solid fa-leaf"></i> Soil Analysis
-        </h2>
-        <p>
-          Detected Soil Type:{' '}
-          <span className="font-semibold">{useFieldData().soilType}</span>
-        </p>
-        <p className="text-sm text-green-600 mt-2">
-          Soil type is determined based on satellite spectral analysis of the selected field.
-        </p>
-        <div className="mt-4">
-          <h3 className="text-lg font-bold text-green-700 mb-2">
-            Closest Water Source (Predicted)
+      {/* Top Right Overlay: Soil Analysis */}
+      {fieldLocation && fieldLocation.lat && (
+        <div className="map-overlay-panel map-overlay-top-right animate-slide-up" style={{ zIndex: 400 }}>
+          <h3 className="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2">
+            <i className="fa-sharp fa-solid fa-leaf text-emerald-500"></i> Soil Analysis
           </h3>
-          <p>
-            Source Type:{' '}
-            <span className="font-semibold">{predictedWaterSource.type}</span>
+          <p className="text-sm text-slate-700 mb-1">
+            Detected Type: <span className="font-semibold text-emerald-700">{soilType}</span>
           </p>
-          <p>
-            Suitable for Agriculture:{' '}
-            <span className="font-semibold">{predictedWaterSource.suitability}</span>
+          <p className="text-xs text-slate-500 leading-tight">
+            Based on ISRIC SoilGrids multi-depth analysis for the selected coordinates.
           </p>
-          <button
-            onClick={() => goToWaterSource('predicted')}
-            className="btn-secondary w-full mt-3 flex items-center justify-center gap-2"
-          >
-            <i className="fa-sharp fa-solid fa-map-marker-alt"></i> View Predicted Source on Map
-          </button>
         </div>
-        <div className="mt-4">
-          <h3 className="text-lg font-bold text-green-700 mb-2">Manually Selected Water Source</h3>
-          <p>
-            Source Type:{' '}
-            <span className="font-semibold">{manualWaterSource?.type || 'N/A'}</span>
-          </p>
-          <p>
-            Suitable for Agriculture:{' '}
-            <span className="font-semibold">{manualWaterSource?.suitability || 'N/A'}</span>
-          </p>
-          <button
-            onClick={enableManualSelection}
-            className="btn-secondary w-full mt-3 flex items-center justify-center gap-2"
-          >
-            <i className="fa-sharp fa-solid fa-hand-pointer"></i> Select Source Manually on Map
-          </button>
-          {manualWaterSource && (
+      )}
+
+      {/* Bottom Left Overlay: Water Sources */}
+      {fieldLocation && fieldLocation.lat && (
+        <div className="map-overlay-panel map-overlay-bottom-left animate-slide-up" style={{ zIndex: 400 }}>
+          <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <i className="fa-sharp fa-solid fa-water text-blue-500"></i> Water Sources
+          </h3>
+          
+          <div className="mb-3 p-2 bg-white/40 rounded-lg">
+            <p className="text-sm font-semibold text-gray-700 mb-1">Nearest Predicted</p>
+            <p className="text-xs text-gray-600 truncate">{predictedWaterSource.type}</p>
             <button
-              onClick={() => goToWaterSource('manual')}
-              className="btn-secondary w-full mt-3 flex items-center justify-center gap-2"
+              onClick={() => goToWaterSource('predicted')}
+              className="text-xs text-blue-600 hover:text-blue-800 font-medium mt-1 flex items-center gap-1"
             >
-              <i className="fa-sharp fa-solid fa-map-marker-alt"></i> View Manually Selected Source
+              <i className="fa-solid fa-location-arrow"></i> View on Map
             </button>
-          )}
+          </div>
+
+          <div className="p-2 bg-white/40 rounded-lg">
+            <p className="text-sm font-semibold text-gray-700 mb-1">Manual Selection</p>
+            {manualWaterSource ? (
+              <>
+                <p className="text-xs text-gray-600 truncate">{manualWaterSource.type}</p>
+                <button
+                  onClick={() => goToWaterSource('manual')}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-medium mt-1 flex items-center gap-1"
+                >
+                  <i className="fa-solid fa-location-arrow"></i> View on Map
+                </button>
+              </>
+            ) : (
+              <p className="text-xs text-gray-500 italic">No manual source selected.</p>
+            )}
+            <button
+              onClick={enableManualSelection}
+              className="text-xs bg-gray-200/50 hover:bg-gray-300/50 text-gray-700 px-2 py-1 rounded mt-2 transition-colors w-full text-left"
+            >
+              <i className="fa-solid fa-hand-pointer mr-1"></i> Select on Map
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Prediction Info Window (Overlay) */}
+      {predictionInfo && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[500] glass-panel p-6 shadow-2xl min-w-[300px]">
+          <button
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition-colors"
+            onClick={() => setPredictionInfo(null)}
+          >
+            <i className="fa-solid fa-xmark text-xl"></i>
+          </button>
+          <h3 className="text-xl font-bold text-gray-800 mb-4 pr-6">Simulated Source Details</h3>
+          <div className="space-y-2 text-sm text-gray-700">
+            <p><span className="font-semibold text-gray-900">Type:</span> {predictionInfo.type}</p>
+            <p><span className="font-semibold text-gray-900">Volume:</span> {predictionInfo.volume}</p>
+            <p><span className="font-semibold text-gray-900">Quality:</span> {predictionInfo.quality}</p>
+            <p><span className="font-semibold text-gray-900">Depth:</span> {predictionInfo.depth}</p>
+          </div>
+        </div>
+      )}
 
       {/* Map Selection Modal */}
       {showMapSelectionModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button className="close-btn" onClick={() => setShowMapSelectionModal(false)}>
-              &times;
-            </button>
-            <h3 className="text-2xl font-bold mb-4">Select Water Source on Map</h3>
-            <p className="text-lg mb-4">Click anywhere on the map to select the water source.</p>
-            <p className="text-sm text-green-200">
-              A marker will be placed at your selected location.
-            </p>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[1000] flex items-center justify-center p-4">
+          <div className="glass-panel bg-white/90 p-6 sm:p-8 max-w-md w-full animate-slide-up">
+            <h3 className="text-2xl font-bold text-gray-800 mb-3">Select Water Source</h3>
+            <p className="text-gray-600 mb-6">Click anywhere on the interactive map to place a manual water source marker.</p>
             <button
               onClick={() => setShowMapSelectionModal(false)}
-              className="btn-primary w-full mt-4"
+              className="btn-primary-glass w-full"
             >
-              Okay
+              Understood
             </button>
           </div>
         </div>
