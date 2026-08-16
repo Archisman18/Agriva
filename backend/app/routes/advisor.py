@@ -1,13 +1,11 @@
 from fastapi import APIRouter, Body, HTTPException
 from typing import Dict, Any, List
-import google.generativeai as genai
+import httpx
 from app.config import settings
 
 router = APIRouter()
 
-# Initialize Gemini if API key is present
-if settings.gemini_api_key:
-    genai.configure(api_key=settings.gemini_api_key)
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 @router.post("/chat")
 async def chat_with_advisor(data: Dict[str, Any] = Body(...)):
@@ -18,16 +16,14 @@ async def chat_with_advisor(data: Dict[str, Any] = Body(...)):
     if not message:
         raise HTTPException(status_code=400, detail="Message is required")
         
-    if not settings.gemini_api_key:
-        return {"reply": "The Gemini API key is not configured. This is a placeholder response. To enable AI responses, please set the GEMINI_API_KEY environment variable."}
+    if not settings.groq_api_key:
+        return {"reply": "The AI API key is not configured. Please set the GROQ_API_KEY environment variable in your .env file."}
         
     try:
-        model = genai.GenerativeModel('gemini-1.5-pro-latest')
-        
         # Construct system prompt from context
-        system_prompt = f"You are an expert agricultural field advisor for Agriva. You are assisting a farmer with their field analysis.\n"
+        system_prompt = "You are an expert agricultural field advisor for Agriva. You are assisting a farmer with their field analysis.\n"
         if context:
-            system_prompt += f"Here is the context of the farmer's field:\n"
+            system_prompt += "Here is the context of the farmer's field:\n"
             if context.get("soilType"): system_prompt += f"- Soil Type: {context['soilType']}\n"
             if context.get("budget"): system_prompt += f"- Budget: ${context['budget']}\n"
             if context.get("desiredCrop"): system_prompt += f"- Desired Crop: {context['desiredCrop']}\n"
@@ -37,22 +33,42 @@ async def chat_with_advisor(data: Dict[str, Any] = Body(...)):
         
         system_prompt += "\nAnswer the user's questions clearly, concisely, and based on best agricultural practices. If asked about something outside agriculture, politely decline."
         
-        # Format history for Gemini
-        formatted_history = []
+        # Build messages array (OpenAI-compatible format)
+        messages = [{"role": "system", "content": system_prompt}]
+        
         for msg in history:
-            role = "user" if msg["role"] == "user" else "model"
-            formatted_history.append({"role": role, "parts": [msg["content"]]})
-            
-        chat = model.start_chat(history=formatted_history)
+            role = "user" if msg["role"] == "user" else "assistant"
+            messages.append({"role": role, "content": msg["content"]})
         
-        # Send message with system prompt prepended (if this is the first message or if we want to enforce context)
-        # For simplicity, we just send the message. Ideally, system instructions are set during model initialization in newer API versions.
-        full_message = f"System Context: {system_prompt}\n\nUser Question: {message}"
+        # Add the current user message
+        messages.append({"role": "user", "content": message})
         
-        response = chat.send_message(full_message)
+        # Call Groq API
+        async with httpx.AsyncClient(timeout=30.0) as http_client:
+            response = await http_client.post(
+                GROQ_URL,
+                headers={
+                    "Authorization": f"Bearer {settings.groq_api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "llama-3.3-70b-versatile",
+                    "messages": messages,
+                    "temperature": 0.7,
+                    "max_tokens": 1024,
+                }
+            )
         
-        return {"reply": response.text}
+        if response.status_code != 200:
+            print(f"Groq API Error: {response.status_code} {response.text}")
+            raise Exception(f"Groq returned {response.status_code}")
+        
+        result = response.json()
+        reply = result["choices"][0]["message"]["content"]
+        print(f"✅ AI Advisor responded via Groq (llama-3.3-70b-versatile)")
+        
+        return {"reply": reply}
         
     except Exception as e:
-        print(f"Gemini API Error: {e}")
+        print(f"AI Advisor Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to communicate with AI Advisor")

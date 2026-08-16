@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+backend/venv/
+__pycache__/
+*.pyc
+
+# Environment variables (API keys!)
+.env
+backend/.env
+
+# Database files
+*.db
+*.sqlite3
+
+# Build output
+frontend/dist/
+frontend/build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# ML model artifacts
+backend/*.joblib
+backend/models/
+
+# Misc
+backend/list_models.py

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     mongo_db_name: str = "agriva"
 
     # API Keys
-    gemini_api_key: str = ""
+    groq_api_key: str = ""
 
     # Server
     host: str = "0.0.0.0"
