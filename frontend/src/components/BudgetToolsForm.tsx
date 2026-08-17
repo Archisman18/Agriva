@@ -116,7 +116,7 @@ export default function BudgetToolsForm({ onAnalysisComplete }: BudgetToolsFormP
 
   return (
     <>
-      <div className="glass-panel p-6 mb-6">
+      <div className="glass-panel p-6 mb-6 shrink-0">
         <h2 className="text-xl font-bold text-[#2B2420] mb-6 flex items-center gap-3 border-b border-[#6B4E3D]/20 pb-4">
           <span className="w-8 h-8 rounded-full bg-[#C4703A] text-white flex items-center justify-center text-sm font-bold shadow-sm font-sans">2</span>
           Project Parameters
@@ -125,7 +125,7 @@ export default function BudgetToolsForm({ onAnalysisComplete }: BudgetToolsFormP
         <div className="space-y-5">
           <div>
             <label className="block text-slate-700 text-sm font-semibold mb-1">
-              Estimated Budget ($)
+              Estimated Budget (₹)
             </label>
             <input
               type="text"
@@ -188,7 +188,7 @@ export default function BudgetToolsForm({ onAnalysisComplete }: BudgetToolsFormP
           <div className="premium-spinner"></div>
           <h3 className="text-3xl font-bold text-slate-800 tracking-tight">Analyzing Field Data...</h3>
           <p className="text-slate-600 mt-3 text-lg max-w-md text-center">
-            Groq Llama 3.3 is currently processing soil data, climate vectors, and water availability.
+            Agriva AI is currently processing soil data, climate vectors, and water availability.
           </p>
         </div>
       )}

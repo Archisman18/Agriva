@@ -37,9 +37,9 @@ export default function MapView() {
       mapRef.current = map;
 
       osmLayerRef.current = L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
         {
-          attribution: '&copy; OpenStreetMap',
+          attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
         }
       ).addTo(map);
 

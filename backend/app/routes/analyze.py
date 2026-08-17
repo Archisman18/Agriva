@@ -65,7 +65,6 @@ The JSON object must have exactly the following structure:
                     "model": "qwen/qwen3.6-27b",
                     "messages": messages,
                     "temperature": 0.2,
-                    "response_format": {"type": "json_object"},
                     "max_tokens": 2048,
                 }
             )
@@ -81,8 +80,21 @@ The JSON object must have exactly the following structure:
         import re
         content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
         
+        # Clean markdown code blocks if present
+        if "```" in content:
+            matches = re.findall(r'```(?:json)?(.*?)```', content, re.DOTALL)
+            if matches:
+                content = matches[0].strip()
+        
+        # Find JSON object boundaries
+        start_idx = content.find('{')
+        end_idx = content.rfind('}')
+        if start_idx != -1 and end_idx != -1:
+            content = content[start_idx:end_idx+1]
+        
         # Parse JSON
         parsed_content = json.loads(content)
+        print("✅ AI Field Analysis completed successfully via Groq (qwen/qwen3.6-27b)")
         return parsed_content
         
     except Exception as e:
