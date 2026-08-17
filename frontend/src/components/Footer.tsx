@@ -11,10 +11,10 @@ export default function Footer() {
             Empowering modern farmers with AI-driven insights, climate analysis, and sustainable agricultural tools for a better harvest.
           </p>
         </div>
-        
+
         <div className="flex flex-col items-center md:items-end gap-4">
           <p className="text-sm text-slate-500 mt-2">
-            Designed to help you grow smarter.
+
           </p>
         </div>
       </div>
