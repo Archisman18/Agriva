@@ -52,7 +52,7 @@ async def chat_with_advisor(data: Dict[str, Any] = Body(...)):
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",
+                    "model": "qwen/qwen3.6-27b",
                     "messages": messages,
                     "temperature": 0.7,
                     "max_tokens": 1024,
@@ -65,7 +65,7 @@ async def chat_with_advisor(data: Dict[str, Any] = Body(...)):
         
         result = response.json()
         reply = result["choices"][0]["message"]["content"]
-        print(f"✅ AI Advisor responded via Groq (llama-3.3-70b-versatile)")
+        print(f"✅ AI Advisor responded via Groq (qwen/qwen3.6-27b)")
         
         return {"reply": reply}
         

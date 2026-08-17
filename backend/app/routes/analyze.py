@@ -62,7 +62,7 @@ The JSON object must have exactly the following structure:
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",
+                    "model": "qwen/qwen3.6-27b",
                     "messages": messages,
                     "temperature": 0.2,
                     "response_format": {"type": "json_object"},
