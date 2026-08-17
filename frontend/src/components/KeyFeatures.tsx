@@ -26,14 +26,14 @@ function FeatureCard({ feature }: { feature: any }) {
 
       {/* Pop-out Content Panel */}
       <div 
-        className={`absolute bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md px-5 pt-6 pb-5 shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col items-start text-left border-t border-slate-700 ${
+        className={`absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md px-5 pt-6 pb-5 shadow-[0_-15px_40px_rgba(0,0,0,0.1)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col items-start text-left border-t border-emerald-100 ${
           isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
         }`}
       >
-        <h3 className="text-white font-bold mb-2 text-lg">{feature.title}</h3>
-        <p className="text-sm text-slate-300 leading-relaxed mb-4">{feature.description}</p>
+        <h3 className="text-emerald-800 font-bold mb-1 text-lg">{feature.title}</h3>
+        <p className="text-sm text-slate-600 leading-relaxed mb-4">{feature.description}</p>
         <button 
-          className="w-full rounded-md border border-slate-700 bg-slate-800/80 px-4 py-2 text-sm text-slate-100 transition-colors duration-300 hover:bg-slate-700 font-medium"
+          className="w-full rounded-md border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-800 transition-colors duration-300 hover:bg-emerald-100 font-semibold shadow-sm"
           onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
         >
           Close
