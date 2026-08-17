@@ -1,3 +1,48 @@
+import { useState } from 'react';
+
+function FeatureCard({ feature }: { feature: any }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div 
+      className="col relative overflow-hidden cursor-pointer group select-none"
+      onClick={() => setIsOpen(!isOpen)}
+      style={{ padding: '0' }} // Reset padding so absolute positioning fills the card
+    >
+      {/* Background/Base content that blurs and scales */}
+      <div className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] w-full h-full flex flex-col items-center justify-center p-6 ${
+        isOpen ? 'scale-[1.15] blur-[4px] opacity-30' : 'scale-100 blur-0 opacity-100'
+      }`}>
+        <div className="icon">
+          <i className={feature.icon}></i>
+        </div>
+        <h1 className="mb-0">{feature.title}</h1>
+        {/* Click affordance */}
+        <div className="mt-4 text-emerald-500/0 group-hover:text-emerald-500/50 transition-colors duration-300">
+          <span className="text-xs font-bold uppercase tracking-widest mr-2">Click to read</span>
+          <i className="fa-solid fa-hand-pointer animate-bounce"></i>
+        </div>
+      </div>
+
+      {/* Pop-out Content Panel */}
+      <div 
+        className={`absolute bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md px-5 pt-6 pb-5 shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col items-start text-left border-t border-slate-700 ${
+          isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
+        <h3 className="text-white font-bold mb-2 text-lg">{feature.title}</h3>
+        <p className="text-sm text-slate-300 leading-relaxed mb-4">{feature.description}</p>
+        <button 
+          className="w-full rounded-md border border-slate-700 bg-slate-800/80 px-4 py-2 text-sm text-slate-100 transition-colors duration-300 hover:bg-slate-700 font-medium"
+          onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function KeyFeatures() {
   const features = [
     {
@@ -18,6 +63,12 @@ export default function KeyFeatures() {
       description:
         'Analyze past weather and soil data to make smarter farming decisions today.',
     },
+    {
+      icon: 'fa-solid fa-robot',
+      title: 'AI Chatbot',
+      description:
+        'Get instant, intelligent agricultural advice from our state-of-the-art AI assistant tailored to your specific field.',
+    },
   ];
 
   return (
@@ -30,13 +81,7 @@ export default function KeyFeatures() {
         </div>
         <div className="row">
           {features.map((feature, index) => (
-            <div className="col" key={index}>
-              <div className="icon">
-                <i className={feature.icon}></i>
-              </div>
-              <h1>{feature.title}</h1>
-              <p>{feature.description}</p>
-            </div>
+            <FeatureCard key={index} feature={feature} />
           ))}
         </div>
       </div>

@@ -5,6 +5,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
     scroll-behavior: smooth;
 }
 
@@ -348,9 +351,10 @@ section.keyfeatures .row .col {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 30px;
-    width: 100%;
-    max-width: 350px;
+    padding: 25px;
+    flex: 1;
+    min-width: 230px;
+    max-width: 300px;
     min-height: 250px;
     background-color: #fff;
     border-radius: 15px;
@@ -531,7 +535,7 @@ footer span {
     }
 
     section.keyfeatures .row .col {
-        max-width: 320px;
+        max-width: 260px;
     }
 
     section.purpose_of_it {
