@@ -1,14 +1,9 @@
+import { scrollToSection } from '../utils/smoothScroll';
+
 export default function HeroSection() {
   const handleExploreClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const target = document.getElementById('keyfeatures');
-    const navHeight = document.querySelector('nav.landing-nav')?.clientHeight || 0;
-    if (target) {
-      window.scrollTo({
-        top: target.offsetTop - navHeight,
-        behavior: 'smooth',
-      });
-    }
+    scrollToSection('keyfeatures');
   };
 
   return (

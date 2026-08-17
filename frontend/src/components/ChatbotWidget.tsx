@@ -117,12 +117,8 @@ export default function ChatbotWidget() {
             if (msg.role === 'model') {
               cleanContent = cleanContent.replace(/<think>[\s\S]*?<\/think>/gi, '');
               cleanContent = cleanContent.replace(/<think>[\s\S]*$/gi, '');
-              const finalMatch = cleanContent.match(/(?:Final Answer|Final Response|Response):\s*([\s\S]*)$/i);
-              if (finalMatch) {
-                cleanContent = finalMatch[1];
-              } else {
-                cleanContent = cleanContent.replace(/^(?:Thinking|Draft)(?:\sProcess)?.*?\n={3,}\n/gis, '');
-              }
+              cleanContent = cleanContent.replace(/^(?:Here's a thinking process:?|Thinking Process:?|Draft:)[\s\S]*?(?=(?:Based on|Hello|Hi|To answer|For |Here are|\*\*|1\.|#))/gi, '');
+              cleanContent = cleanContent.replace(/\d+\.\s*Self-Cor.*$/gim, '');
               cleanContent = cleanContent.trim() || msg.content;
             }
 

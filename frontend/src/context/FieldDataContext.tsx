@@ -33,9 +33,9 @@ const defaultWaterSource: WaterSource = {
 const FieldDataContext = createContext<FieldDataContextType | undefined>(undefined);
 
 export function FieldDataProvider({ children }: { children: React.ReactNode }) {
-  const [referralId, setReferralId] = useState<string>('Generating...');
+  const [referralId, setReferralId] = useState<string>(() => 'AGRO-' + Math.random().toString(36).substring(2, 10).toUpperCase());
   const [fieldLocation, setFieldLocation] = useState<Coordinates | null>(null);
-  const [soilType, setSoilType] = useState<string>('N/A');
+  const [soilType, setSoilType] = useState<string>('');
   const [predictedWaterSource, setPredictedWaterSource] =
     useState<WaterSource>(defaultWaterSource);
   const [manualWaterSource, setManualWaterSource] = useState<WaterSource | null>(null);
@@ -50,10 +50,14 @@ export function FieldDataProvider({ children }: { children: React.ReactNode }) {
     return id;
   }, []);
 
+  React.useEffect(() => {
+    generateReferralId();
+  }, [generateReferralId]);
+
   const resetAll = useCallback(() => {
-    setReferralId('Generating...');
+    generateReferralId();
     setFieldLocation(null);
-    setSoilType('N/A');
+    setSoilType('');
     setPredictedWaterSource(defaultWaterSource);
     setManualWaterSource(null);
     setBudget('');

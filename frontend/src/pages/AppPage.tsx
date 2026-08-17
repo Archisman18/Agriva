@@ -97,7 +97,7 @@ export default function AppPage() {
     
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     
-    if (val.trim().length < 3) {
+    if (val.trim().length < 2) {
       setLocationSuggestions([]);
       setShowSuggestions(false);
       return;
@@ -115,7 +115,7 @@ export default function AppPage() {
       } catch (error) {
         console.error('Error fetching location suggestions:', error);
       }
-    }, 200);
+    }, 100);
   };
 
   const handleSelectSuggestion = (suggestion: any) => {
@@ -228,14 +228,12 @@ export default function AppPage() {
         </div>
 
         {/* Field Summary Strip */}
-        {(latInput || lngInput || soilType) && (
-          <div className="bg-[#D4A857]/20 border border-[#D4A857]/50 rounded-lg p-3 flex flex-wrap gap-4 text-sm font-medium mb-4 text-[#2B2420] shrink-0">
-            {latInput && lngInput && (
-              <span className="flex items-center gap-1">
-                <i className="fa-solid fa-location-dot text-[#C4703A]"></i> {latInput}, {lngInput}
-              </span>
-            )}
-            {soilType && (
+        {latInput && lngInput && (
+          <div className="bg-[#D4A857]/20 border border-[#D4A857]/50 rounded-lg p-3 flex flex-wrap gap-4 text-sm font-medium mb-4 text-[#2B2420] shrink-0 animate-slide-up">
+            <span className="flex items-center gap-1">
+              <i className="fa-solid fa-location-dot text-[#C4703A]"></i> {latInput}, {lngInput}
+            </span>
+            {soilType && !soilType.toLowerCase().includes('n/a') && (
               <span className="flex items-center gap-1">
                 <i className="fa-solid fa-earth-americas text-[#6B4E3D]"></i> {soilType}
               </span>

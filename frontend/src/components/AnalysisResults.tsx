@@ -55,7 +55,7 @@ export default function AnalysisResults({ data, onReset }: AnalysisResultsProps)
       margin,
       yOffset
     );
-    yOffset = addText(`Estimated Budget: ${data.budget ? `$${data.budget}` : 'N/A'}`, margin, yOffset);
+    yOffset = addText(`Estimated Budget: ${data.budget ? `₹${data.budget}` : 'N/A'}`, margin, yOffset);
     yOffset = addText(`Available Tools: ${data.availableTools || 'N/A'}`, margin, yOffset);
     yOffset = addText(`Desired Crop: ${data.desiredCrop || 'N/A'}`, margin, yOffset);
     yOffset += sectionSpacing;
@@ -114,42 +114,42 @@ export default function AnalysisResults({ data, onReset }: AnalysisResultsProps)
   };
 
   return (
-    <div className="container mx-auto p-4 sm:p-8 w-full animate-slide-up">
-      <div className="glass-panel p-6 sm:p-10 mb-8 text-center relative overflow-hidden bg-gradient-to-b from-[#F7F3EA] to-[#ffffff]">
+    <div className="container max-w-7xl mx-auto p-3 sm:p-6 lg:p-8 w-full animate-slide-up">
+      <div className="glass-panel p-5 sm:p-8 lg:p-10 mb-6 sm:mb-8 text-center relative overflow-hidden bg-gradient-to-b from-[#F7F3EA] to-[#ffffff]">
         <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-[#D4A857] opacity-10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 bg-[#2F5233] opacity-10 rounded-full blur-3xl"></div>
-        <h1 className="text-3xl sm:text-5xl font-extrabold text-[#2F5233] mb-4">
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#2F5233] mb-2 sm:mb-4 font-serif">
           Agriva Intelligence Report
         </h1>
-        <p className="text-[#6B4E3D] font-medium">Powered by AI & Satellite Data</p>
+        <p className="text-[#6B4E3D] font-medium text-sm sm:text-base">Powered by AI & Satellite Data</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         
         {/* Field Summary */}
-        <div className="glass-panel p-6 col-span-1 md:col-span-2 lg:col-span-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="glass-panel p-4 sm:p-6 col-span-1 md:col-span-2 lg:col-span-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-[#2B2420] mb-2">Field Overview</h2>
-            <p className="text-[#6B4E3D]">ID: <span className="font-mono text-[#C4703A] font-semibold">{data.referralId}</span></p>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#2B2420] mb-1 sm:mb-2 font-serif">Field Overview</h2>
+            <p className="text-[#6B4E3D] text-sm sm:text-base">ID: <span className="font-mono text-[#C4703A] font-semibold">{data.referralId}</span></p>
           </div>
-          <div className="flex gap-3 w-full md:w-auto">
-            <button onClick={downloadPdf} className="btn-secondary-glass flex-1 md:flex-none flex items-center justify-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
+            <button onClick={downloadPdf} className="btn-secondary-glass flex-1 md:flex-none flex items-center justify-center gap-2 py-2.5 px-4 text-sm sm:text-base">
               <i className="fa-solid fa-file-pdf"></i> Download PDF
             </button>
-            <button onClick={onReset} className="btn-primary-glass flex-1 md:flex-none flex items-center justify-center gap-2">
+            <button onClick={onReset} className="btn-primary-glass flex-1 md:flex-none flex items-center justify-center gap-2 py-2.5 px-4 text-sm sm:text-base">
               <i className="fa-solid fa-rotate-left"></i> New Analysis
             </button>
           </div>
         </div>
 
         {/* Inputs Summary */}
-        <div className="glass-panel p-6">
-          <h3 className="text-lg font-bold text-[#2B2420] border-b border-[#6B4E3D]/20 pb-3 mb-4">
+        <div className="glass-panel p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-bold text-[#2B2420] border-b border-[#6B4E3D]/20 pb-3 mb-4 font-serif">
             <i className="fa-solid fa-clipboard-list text-[#2F5233] mr-2"></i> Inputs
           </h3>
-          <ul className="space-y-3 text-sm text-[#6B4E3D]">
+          <ul className="space-y-3 text-xs sm:text-sm text-[#6B4E3D]">
             <li><span className="font-semibold text-[#2B2420] block text-xs uppercase tracking-wider text-[#6B4E3D] mb-1">Location</span>{data.fieldLocation ? `${data.fieldLocation.lat?.toFixed(4)}, ${data.fieldLocation.lng?.toFixed(4)}` : 'N/A'}</li>
-            <li><span className="font-semibold text-[#2B2420] block text-xs uppercase tracking-wider text-[#6B4E3D] mb-1">Budget</span>{data.budget ? `$${data.budget}` : 'N/A'}</li>
+            <li><span className="font-semibold text-[#2B2420] block text-xs uppercase tracking-wider text-[#6B4E3D] mb-1">Budget</span>{data.budget ? `₹${data.budget}` : 'N/A'}</li>
             <li><span className="font-semibold text-[#2B2420] block text-xs uppercase tracking-wider text-[#6B4E3D] mb-1">Tools</span>{data.availableTools || 'N/A'}</li>
             <li><span className="font-semibold text-[#2B2420] block text-xs uppercase tracking-wider text-[#6B4E3D] mb-1">Target Crop</span>{data.desiredCrop || 'N/A'}</li>
           </ul>
@@ -190,9 +190,9 @@ export default function AnalysisResults({ data, onReset }: AnalysisResultsProps)
               <BarChart layout="vertical" data={[
                 { name: 'Flood', risk: data.climateRisks.floodRisk.toLowerCase().includes('high') ? 80 : data.climateRisks.floodRisk.toLowerCase().includes('low') ? 20 : 50 },
                 { name: 'Drought', risk: data.climateRisks.droughtRisk.toLowerCase().includes('high') ? 80 : data.climateRisks.droughtRisk.toLowerCase().includes('low') ? 20 : 50 }
-              ]} margin={{ top: 0, right: 20, bottom: 0, left: -10 }}>
+              ]} margin={{ top: 0, right: 20, bottom: 0, left: 10 }}>
                 <XAxis type="number" hide domain={[0, 100]} />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} style={{ fontSize: '13px', fill: '#6B4E3D', fontWeight: 600 }} />
+                <YAxis dataKey="name" type="category" width={60} axisLine={false} tickLine={false} style={{ fontSize: '13px', fill: '#6B4E3D', fontWeight: 600 }} />
                 <Bar dataKey="risk" radius={[0, 4, 4, 0]} barSize={16}>
                   {[
                     { name: 'Flood', risk: data.climateRisks.floodRisk.toLowerCase().includes('high') ? 80 : data.climateRisks.floodRisk.toLowerCase().includes('low') ? 20 : 50 },

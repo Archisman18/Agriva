@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { scrollToSection } from '../utils/smoothScroll';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -13,8 +14,10 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLinkClick = () => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
     setMenuOpen(false);
+    scrollToSection(targetId);
   };
 
   return (
@@ -35,22 +38,22 @@ export default function Navbar() {
         <div className="links">
           <ul>
             <li>
-              <a href="#home" onClick={handleLinkClick}>
+              <a href="#home" onClick={(e) => handleNavClick(e, 'home')}>
                 home
               </a>
             </li>
             <li>
-              <a href="#keyfeatures" onClick={handleLinkClick}>
+              <a href="#keyfeatures" onClick={(e) => handleNavClick(e, 'keyfeatures')}>
                 key features
               </a>
             </li>
             <li>
-              <a href="#purpose_of_it" onClick={handleLinkClick}>
+              <a href="#purpose_of_it" onClick={(e) => handleNavClick(e, 'purpose_of_it')}>
                 purpose of it
               </a>
             </li>
             <li>
-              <a href="#howitworks" onClick={handleLinkClick}>
+              <a href="#howitworks" onClick={(e) => handleNavClick(e, 'howitworks')}>
                 how it works
               </a>
             </li>

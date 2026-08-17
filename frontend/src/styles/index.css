@@ -7,10 +7,6 @@
     box-sizing: border-box;
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
 /* Global Typography and Color Variables */
 :root {
     --primary-green: #38a169;
@@ -332,6 +328,29 @@ section.landing-section .title h1::after {
     transform: translateX(-50%);
     bottom: -10px;
     border-radius: 2px;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+section.landing-section .title h1.section-highlight::after {
+    animation: titlePulse 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes titlePulse {
+    0% {
+        transform: translateX(-50%) scaleX(1);
+        background-color: var(--primary-green);
+        box-shadow: 0 0 0 rgba(56, 161, 105, 0);
+    }
+    50% {
+        transform: translateX(-50%) scaleX(1.35);
+        background-color: var(--accent-gold);
+        box-shadow: 0 0 12px rgba(251, 211, 141, 0.8);
+    }
+    100% {
+        transform: translateX(-50%) scaleX(1);
+        background-color: var(--primary-green);
+        box-shadow: 0 0 0 rgba(56, 161, 105, 0);
+    }
 }
 
 /* Key Features Section */
