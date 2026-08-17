@@ -13,17 +13,8 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
-    e.preventDefault();
+  const handleLinkClick = () => {
     setMenuOpen(false);
-    const target = document.getElementById(targetId);
-    if (target) {
-      const navHeight = document.querySelector('nav.landing-nav')?.clientHeight || 0;
-      window.scrollTo({
-        top: target.offsetTop - navHeight,
-        behavior: 'smooth',
-      });
-    }
   };
 
   return (
@@ -44,22 +35,22 @@ export default function Navbar() {
         <div className="links">
           <ul>
             <li>
-              <a href="#home" onClick={(e) => handleLinkClick(e, 'home')}>
+              <a href="#home" onClick={handleLinkClick}>
                 home
               </a>
             </li>
             <li>
-              <a href="#keyfeatures" onClick={(e) => handleLinkClick(e, 'keyfeatures')}>
+              <a href="#keyfeatures" onClick={handleLinkClick}>
                 key features
               </a>
             </li>
             <li>
-              <a href="#purpose_of_it" onClick={(e) => handleLinkClick(e, 'purpose_of_it')}>
+              <a href="#purpose_of_it" onClick={handleLinkClick}>
                 purpose of it
               </a>
             </li>
             <li>
-              <a href="#howitworks" onClick={(e) => handleLinkClick(e, 'howitworks')}>
+              <a href="#howitworks" onClick={handleLinkClick}>
                 how it works
               </a>
             </li>

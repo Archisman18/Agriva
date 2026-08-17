@@ -117,8 +117,9 @@ export default function BudgetToolsForm({ onAnalysisComplete }: BudgetToolsFormP
   return (
     <>
       <div className="glass-panel p-6 mb-6">
-        <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-200/50 pb-4">
-          <i className="fa-sharp fa-solid fa-list-check text-emerald-600"></i> Project Parameters
+        <h2 className="text-xl font-bold text-[#2B2420] mb-6 flex items-center gap-3 border-b border-[#6B4E3D]/20 pb-4">
+          <span className="w-8 h-8 rounded-full bg-[#C4703A] text-white flex items-center justify-center text-sm font-bold shadow-sm font-sans">2</span>
+          Project Parameters
         </h2>
         
         <div className="space-y-5">

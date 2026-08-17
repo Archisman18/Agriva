@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useFieldData } from '../context/FieldDataContext';
 import MapView from '../components/MapView';
 import BudgetToolsForm from '../components/BudgetToolsForm';
@@ -23,7 +24,7 @@ export default function AppPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { referralId, generateReferralId } = useFieldData();
+  const { referralId, generateReferralId, soilType } = useFieldData();
   const { getLocation } = useGeolocation();
 
   const callUpdateMap = (lat: number, lng: number) => {
@@ -206,21 +207,47 @@ export default function AppPage() {
         {/* Left Column: Controls (40%) */}
       <div className="lg:w-2/5 flex flex-col gap-6 lg:h-[calc(100vh-4rem)] overflow-y-auto pr-2 animate-slide-up" style={{ scrollbarWidth: 'thin' }}>
         
-        {/* Header Glass Panel */}
-        <div className="glass-panel p-6 sm:p-8 text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
-            Agriva Dashboard
-          </h1>
-          <p className="text-gray-600">Empowering Smarter Farming Decisions</p>
+        {/* Back Button */}
+        <div className="pt-2">
+          <Link to="/" className="text-[#6B4E3D] hover:text-[#C4703A] inline-flex items-center gap-2 font-medium transition-colors bg-[#F7F3EA]/50 px-4 py-2 rounded-full border border-[#D4A857]/30 shadow-sm hover:shadow w-fit">
+            <i className="fa-solid fa-arrow-left"></i> Back to Landing Page
+          </Link>
         </div>
 
-        {/* Agricultural Field Data Glass Panel */}
-        <div className="glass-panel p-6">
-          <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
-            <h2 className="text-xl font-bold text-gray-800">Agricultural Field Data</h2>
-            <div className="flex items-center gap-2 bg-white/50 p-2 rounded-lg border border-white/60 shadow-sm backdrop-blur-md">
-              <i className="fa-sharp fa-solid fa-id-card-clip text-green-600 text-lg"></i>
-              <p className="text-sm font-mono text-gray-800 font-semibold">{referralId}</p>
+        {/* Header Glass Panel */}
+        <div className="glass-panel p-6 sm:p-8 text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#2F5233] mb-2">
+            Agriva Dashboard
+          </h1>
+          <p className="text-[#6B4E3D]">Empowering Smarter Farming Decisions</p>
+        </div>
+
+        {/* Field Summary Strip */}
+        {(latInput || lngInput || soilType) && (
+          <div className="bg-[#D4A857]/20 border border-[#D4A857]/50 rounded-lg p-3 flex flex-wrap gap-4 text-sm font-medium mb-4 text-[#2B2420]">
+            {latInput && lngInput && (
+              <span className="flex items-center gap-1">
+                <i className="fa-solid fa-location-dot text-[#C4703A]"></i> {latInput}, {lngInput}
+              </span>
+            )}
+            {soilType && (
+              <span className="flex items-center gap-1">
+                <i className="fa-solid fa-earth-americas text-[#6B4E3D]"></i> {soilType}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Locate your field Glass Panel */}
+        <div className="glass-panel p-6 mb-6">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-2 border-b border-gray-200/50 pb-4">
+            <h2 className="text-xl font-bold flex items-center gap-3">
+              <span className="w-8 h-8 rounded-full bg-[#C4703A] text-white flex items-center justify-center text-sm font-bold shadow-sm font-sans">1</span>
+              Locate your field
+            </h2>
+            <div className="flex items-center gap-2 bg-white/50 p-2 rounded-lg border border-gray-200 shadow-sm backdrop-blur-md">
+              <i className="fa-sharp fa-solid fa-id-card-clip text-[#2F5233] text-lg"></i>
+              <p className="text-sm font-mono text-[#2B2420] font-semibold">{referralId}</p>
               <button
                 onClick={copyReferralId}
                 className="p-1.5 hover:bg-white/60 rounded-md transition-colors"
