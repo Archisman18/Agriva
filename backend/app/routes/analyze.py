@@ -62,7 +62,7 @@ The JSON object must have exactly the following structure:
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",
+                    "model": "qwen/qwen3.6-27b",
                     "messages": messages,
                     "temperature": 0.2,
                     "response_format": {"type": "json_object"},
@@ -76,6 +76,10 @@ The JSON object must have exactly the following structure:
             
         result = response.json()
         content = result["choices"][0]["message"]["content"]
+        
+        # Remove <think>...</think> reasoning blocks to prevent JSON parsing errors
+        import re
+        content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
         
         # Parse JSON
         parsed_content = json.loads(content)
