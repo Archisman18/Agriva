@@ -115,21 +115,33 @@ export default function ChatbotWidget() {
             // Helper to clean up any "thinking" or "draft" artifacts the model might spit out
             let cleanContent = msg.content;
             if (msg.role === 'model') {
-              // Strip <think> tags (closed and unclosed)
               cleanContent = cleanContent.replace(/<think>[\s\S]*?<\/think>/gi, '');
               cleanContent = cleanContent.replace(/<think>[\s\S]*$/gi, '');
-              
-              // Strip markdown "Thinking Process:" or "Draft Response:" blocks
               const finalMatch = cleanContent.match(/(?:Final Answer|Final Response|Response):\s*([\s\S]*)$/i);
               if (finalMatch) {
                 cleanContent = finalMatch[1];
               } else {
-                // If there are explicit headers like "Thinking:" we can try stripping them if there's a clear separation
                 cleanContent = cleanContent.replace(/^(?:Thinking|Draft)(?:\sProcess)?.*?\n={3,}\n/gis, '');
               }
-              
               cleanContent = cleanContent.trim() || msg.content;
             }
+
+            // Super simple markdown formatter for chat bubbles
+            const formatMarkdown = (text: string) => {
+              let html = text
+                .replace(/</g, '&lt;').replace(/>/g, '&gt;') // basic XSS prevention
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold">$1</strong>') // bold
+                .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>') // italic
+                .replace(/`(.*?)`/g, '<code class="bg-black/10 px-1 py-0.5 rounded text-sm font-mono">$1</code>') // inline code
+                .replace(/^### (.*)$/gm, '<h3 class="text-lg font-bold mt-3 mb-1 text-emerald-800">$1</h3>') // h3
+                .replace(/^## (.*)$/gm, '<h2 class="text-xl font-bold mt-4 mb-2 text-emerald-800">$1</h2>') // h2
+                .replace(/^# (.*)$/gm, '<h1 class="text-2xl font-bold mt-4 mb-2 text-emerald-900">$1</h1>') // h1
+                .replace(/^[\-\*]\s+(.*)$/gm, '<div class="pl-4 relative before:content-[\'•\'] before:absolute before:left-0 before:text-emerald-500 before:font-bold">$1</div>') // bullet points
+                .replace(/^(\d+)\.\s+(.*)$/gm, '<div class="pl-5 relative"><span class="absolute left-0 font-bold text-emerald-600/80">$1.</span>$2</div>'); // numbered lists
+              
+              // We use whitespace-pre-wrap to handle regular newlines, but we can also just return the HTML string
+              return html;
+            };
 
             return (
               <div 
@@ -143,7 +155,10 @@ export default function ChatbotWidget() {
                       : 'bg-white text-slate-700 border border-slate-200/60 rounded-bl-sm'
                   } ${isExpanded ? 'text-base' : 'text-sm'}`}
                 >
-                  <p className="leading-relaxed whitespace-pre-wrap">{cleanContent}</p>
+                  <div 
+                    className="leading-relaxed whitespace-pre-wrap"
+                    dangerouslySetInnerHTML={{ __html: formatMarkdown(cleanContent) }}
+                  />
                 </div>
               </div>
             );
