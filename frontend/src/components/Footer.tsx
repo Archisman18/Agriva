@@ -13,12 +13,7 @@ export default function Footer() {
         </div>
         
         <div className="flex flex-col items-center md:items-end gap-4">
-          <div className="flex gap-4 text-emerald-500">
-            <a href="#" className="hover:text-emerald-400 transition-colors"><i className="fa-brands fa-twitter text-xl"></i></a>
-            <a href="#" className="hover:text-emerald-400 transition-colors"><i className="fa-brands fa-facebook text-xl"></i></a>
-            <a href="#" className="hover:text-emerald-400 transition-colors"><i className="fa-brands fa-instagram text-xl"></i></a>
-          </div>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 mt-2">
             Designed to help you grow smarter.
           </p>
         </div>
