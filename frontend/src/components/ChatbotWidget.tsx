@@ -88,7 +88,6 @@ export default function ChatbotWidget() {
             </div>
             <div>
               <h3 className="font-bold font-heading text-lg leading-tight">AI Advisor</h3>
-              <p className="text-xs text-emerald-400/80 font-medium tracking-wide">Powered by Groq</p>
             </div>
           </div>
           

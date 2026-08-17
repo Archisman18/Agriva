@@ -77,6 +77,10 @@ The JSON object must have exactly the following structure:
         result = response.json()
         content = result["choices"][0]["message"]["content"]
         
+        # Remove <think>...</think> reasoning blocks to prevent JSON parsing errors
+        import re
+        content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+        
         # Parse JSON
         parsed_content = json.loads(content)
         return parsed_content
