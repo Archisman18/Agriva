@@ -2,8 +2,6 @@ fastapi
 uvicorn
 pydantic
 pydantic-settings
-motor
-pymongo
 sqlalchemy
 aiosqlite
 httpx

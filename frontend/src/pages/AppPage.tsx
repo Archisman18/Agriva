@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useFieldData } from '../context/FieldDataContext';
 import MapView from '../components/MapView';
 import BudgetToolsForm from '../components/BudgetToolsForm';
 import AnalysisResults from '../components/AnalysisResults';
-import RestoreIdModal from '../components/RestoreIdModal';
 import { searchLocation } from '../services/api';
 import { useGeolocation } from '../hooks/useGeolocation';
 import type { FieldData } from '../types';
@@ -13,7 +12,6 @@ import '../styles/app.css';
 export default function AppPage() {
   const [showResults, setShowResults] = useState(false);
   const [analysisData, setAnalysisData] = useState<FieldData | null>(null);
-  const [showRestoreModal, setShowRestoreModal] = useState(false);
   const [showManualCoords, setShowManualCoords] = useState(false);
   const [locationStatus, setLocationStatus] = useState('');
   const [locationStatusClass, setLocationStatusClass] = useState('');
@@ -24,7 +22,7 @@ export default function AppPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { referralId, generateReferralId, soilType } = useFieldData();
+  const { soilType } = useFieldData();
   const { getLocation } = useGeolocation();
 
   const callUpdateMap = (lat: number, lng: number) => {
@@ -171,21 +169,7 @@ export default function AppPage() {
   const handleReset = () => {
     setShowResults(false);
     setAnalysisData(null);
-    generateReferralId();
     window.location.reload();
-  };
-
-  const copyReferralId = () => {
-    navigator.clipboard.writeText(referralId).then(
-      () => {
-        setLocationStatus('Referral ID copied to clipboard!');
-        setLocationStatusClass('text-sm text-green-700 mt-2 font-medium');
-      },
-      () => {
-        setLocationStatus('Failed to copy ID. Please copy manually.');
-        setLocationStatusClass('text-sm text-red-500 mt-2 font-medium');
-      }
-    );
   };
 
   if (showResults && analysisData) {
@@ -248,24 +232,6 @@ export default function AppPage() {
               <span className="w-8 h-8 rounded-full bg-[#C4703A] text-white flex items-center justify-center text-sm font-bold shadow-sm font-sans">1</span>
               Locate your field
             </h2>
-            <div className="flex items-center gap-2 bg-white/50 p-2 rounded-lg border border-gray-200 shadow-sm backdrop-blur-md">
-              <i className="fa-sharp fa-solid fa-id-card-clip text-[#2F5233] text-lg"></i>
-              <p className="text-sm font-mono text-[#2B2420] font-semibold">{referralId || 'Not Generated'}</p>
-              <button
-                onClick={copyReferralId}
-                className="p-1.5 hover:bg-white/60 rounded-md transition-colors"
-                title="Copy ID"
-              >
-                <i className="fa-regular fa-copy text-green-700"></i>
-              </button>
-              <button
-                onClick={() => setShowRestoreModal(true)}
-                className="p-1.5 hover:bg-white/60 rounded-md transition-colors"
-                title="Restore ID"
-              >
-                <i className="fa-solid fa-clock-rotate-left text-green-700"></i>
-              </button>
-            </div>
           </div>
 
           {/* Location Buttons */}
@@ -366,9 +332,6 @@ export default function AppPage() {
       <div className="lg:w-3/5 relative map-wrapper animate-slide-in-right">
         <MapView />
       </div>
-
-      {/* Restore ID Modal */}
-      <RestoreIdModal show={showRestoreModal} onClose={() => setShowRestoreModal(false)} />
     </div>
     </>
   );

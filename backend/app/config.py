@@ -5,8 +5,6 @@ from typing import List
 class Settings(BaseSettings):
     # Database
     postgres_url: str = "sqlite+aiosqlite:///./agriva.db"
-    mongo_url: str = "mongodb://localhost:27017"
-    mongo_db_name: str = "agriva"
 
     # API Keys
     groq_api_key: str = ""

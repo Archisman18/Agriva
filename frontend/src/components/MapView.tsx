@@ -26,7 +26,6 @@ export default function MapView() {
     manualWaterSource,
     setManualWaterSource,
     setSoilType,
-    generateReferralId,
     soilType
   } = useFieldData();
 
@@ -150,9 +149,8 @@ export default function MapView() {
       setFieldLocation({ lat, lng });
       determineSoilType(lat, lng);
       determinePredictedWaterSource(lat, lng);
-      generateReferralId();
     },
-    [setFieldLocation, determineSoilType, determinePredictedWaterSource, generateReferralId]
+    [setFieldLocation, determineSoilType, determinePredictedWaterSource]
   );
 
   const addPredictedUnderwaterLocations = () => {

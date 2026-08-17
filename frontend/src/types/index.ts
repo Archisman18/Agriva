@@ -51,7 +51,7 @@ export interface CropRecommendations {
 }
 
 export interface FieldData {
-  referralId: string;
+  referralId?: string;
   fieldLocation: Coordinates | null;
   soilType: string;
   predictedWaterSource: WaterSource;

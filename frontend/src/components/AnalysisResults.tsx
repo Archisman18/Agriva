@@ -38,7 +38,6 @@ export default function AnalysisResults({ data, onReset }: AnalysisResultsProps)
     doc.text('Field Summary', margin, yOffset);
     yOffset += lineHeight;
     doc.setFontSize(12);
-    yOffset = addText(`Referral ID: ${data.referralId || 'N/A'}`, margin, yOffset);
     yOffset = addText(
       `Field Location: ${data.fieldLocation ? `${data.fieldLocation.lat?.toFixed(4)}, ${data.fieldLocation.lng?.toFixed(4)}` : 'N/A'}`,
       margin,
@@ -109,7 +108,7 @@ export default function AnalysisResults({ data, onReset }: AnalysisResultsProps)
       yOffset = addText(`- ${crop}`, margin + 5, yOffset);
     });
 
-    const filename = `Agriva_Analysis_${data.referralId || 'Report'}.pdf`;
+    const filename = `Agriva_Field_Analysis_Report.pdf`;
     doc.save(filename);
   };
 
@@ -130,7 +129,7 @@ export default function AnalysisResults({ data, onReset }: AnalysisResultsProps)
         <div className="glass-panel p-4 sm:p-6 col-span-1 md:col-span-2 lg:col-span-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-[#2B2420] mb-1 sm:mb-2 font-serif">Field Overview</h2>
-            <p className="text-[#6B4E3D] text-sm sm:text-base">ID: <span className="font-mono text-[#C4703A] font-semibold">{data.referralId}</span></p>
+            <p className="text-[#6B4E3D] text-sm sm:text-base">Precision AI recommendations based on satellite telemetry & soil composition.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
             <button onClick={downloadPdf} className="btn-secondary-glass flex-1 md:flex-none flex items-center justify-center gap-2 py-2.5 px-4 text-sm sm:text-base">

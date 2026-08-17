@@ -17,18 +17,6 @@ const api = axios.create({
   },
 });
 
-// ===== Field Data =====
-
-export async function saveFieldData(data: FieldData): Promise<{ referralId: string }> {
-  const response = await api.post('/field-data', data);
-  return response.data;
-}
-
-export async function getFieldData(referralId: string): Promise<FieldData> {
-  const response = await api.get(`/field-data/${referralId}`);
-  return response.data;
-}
-
 // ===== Geocoding =====
 
 export async function searchLocation(query: string): Promise<GeocodingResult[]> {

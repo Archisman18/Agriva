@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useFieldData } from '../context/FieldDataContext';
 import type { FieldData } from '../types';
-import { saveFieldData } from '../services/api';
 
 interface BudgetToolsFormProps {
   onAnalysisComplete: (data: FieldData) => void;
@@ -9,7 +8,6 @@ interface BudgetToolsFormProps {
 
 export default function BudgetToolsForm({ onAnalysisComplete }: BudgetToolsFormProps) {
   const {
-    referralId,
     fieldLocation,
     soilType,
     predictedWaterSource,
@@ -88,7 +86,7 @@ export default function BudgetToolsForm({ onAnalysisComplete }: BudgetToolsFormP
     }
 
     const fieldData: FieldData = {
-      referralId,
+      referralId: '',
       fieldLocation,
       soilType,
       predictedWaterSource,
@@ -103,12 +101,6 @@ export default function BudgetToolsForm({ onAnalysisComplete }: BudgetToolsFormP
       recommendations: aiAnalysis.recommendations,
       bestCropRecommendation: aiAnalysis.bestCropRecommendation,
     };
-
-    try {
-      await saveFieldData(fieldData);
-    } catch (e) {
-      console.warn('Backend not available, continuing with local data:', e);
-    }
 
     setShowLoader(false);
     onAnalysisComplete(fieldData);
