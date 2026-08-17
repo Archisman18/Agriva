@@ -111,22 +111,43 @@ export default function ChatbotWidget() {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-slate-50/50">
-          {history.map((msg, idx) => (
-            <div 
-              key={idx} 
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
-            >
+          {history.map((msg, idx) => {
+            // Helper to clean up any "thinking" or "draft" artifacts the model might spit out
+            let cleanContent = msg.content;
+            if (msg.role === 'model') {
+              // Strip <think> tags (closed and unclosed)
+              cleanContent = cleanContent.replace(/<think>[\s\S]*?<\/think>/gi, '');
+              cleanContent = cleanContent.replace(/<think>[\s\S]*$/gi, '');
+              
+              // Strip markdown "Thinking Process:" or "Draft Response:" blocks
+              const finalMatch = cleanContent.match(/(?:Final Answer|Final Response|Response):\s*([\s\S]*)$/i);
+              if (finalMatch) {
+                cleanContent = finalMatch[1];
+              } else {
+                // If there are explicit headers like "Thinking:" we can try stripping them if there's a clear separation
+                cleanContent = cleanContent.replace(/^(?:Thinking|Draft)(?:\sProcess)?.*?\n={3,}\n/gis, '');
+              }
+              
+              cleanContent = cleanContent.trim() || msg.content;
+            }
+
+            return (
               <div 
-                className={`max-w-[85%] p-4 rounded-2xl shadow-sm ${
-                  msg.role === 'user' 
-                    ? 'bg-emerald-600 text-white rounded-br-sm' 
-                    : 'bg-white text-slate-700 border border-slate-200/60 rounded-bl-sm'
-                } ${isExpanded ? 'text-base' : 'text-sm'}`}
+                key={idx} 
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
               >
-                <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                <div 
+                  className={`max-w-[85%] p-4 rounded-2xl shadow-sm ${
+                    msg.role === 'user' 
+                      ? 'bg-emerald-600 text-white rounded-br-sm' 
+                      : 'bg-white text-slate-700 border border-slate-200/60 rounded-bl-sm'
+                  } ${isExpanded ? 'text-base' : 'text-sm'}`}
+                >
+                  <p className="leading-relaxed whitespace-pre-wrap">{cleanContent}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           
           {isLoading && (
             <div className="flex justify-start animate-fade-in">
