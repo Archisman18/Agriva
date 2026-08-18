@@ -100,10 +100,12 @@ export interface WeatherResponse {
 
 export interface SoilResponse {
   soilType: string;
-  ph: number;
-  nitrogen: number;
+  ph: number | null;
+  nitrogen: number | null;
   phosphorus: number;
   potassium: number;
+  soilMoisture?: number | null;
+  source?: string;
 }
 
 export interface PredictResponse {

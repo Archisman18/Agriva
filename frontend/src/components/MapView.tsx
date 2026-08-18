@@ -26,7 +26,9 @@ export default function MapView() {
     manualWaterSource,
     setManualWaterSource,
     setSoilType,
-    soilType
+    setSoilMoisture,
+    soilType,
+    soilMoisture
   } = useFieldData();
 
   useEffect(() => {
@@ -105,12 +107,14 @@ export default function MapView() {
         const { getSoilData } = await import('../services/api');
         const data = await getSoilData(lat, lng);
         setSoilType(data.soilType);
+        setSoilMoisture(data.soilMoisture ?? null);
       } catch (error) {
         console.error('Failed to get soil data', error);
         setSoilType('Unknown (API Error)');
+        setSoilMoisture(null);
       }
     },
-    [setSoilType]
+    [setSoilType, setSoilMoisture]
   );
 
   const determinePredictedWaterSource = useCallback(
@@ -301,8 +305,10 @@ export default function MapView() {
             Detected Type: <span className="font-semibold text-[#C4703A]">{soilType}</span>
           </p>
           <p className="text-xs text-[#6B4E3D] opacity-80 leading-tight">
-            {soilType === 'Loamy (regional estimate)'
-              ? 'Regional estimate shown because SoilGrids has no data at these coordinates.'
+            {soilType === 'Soil data unavailable'
+              ? soilMoisture !== null
+                ? `Soil texture unavailable. Current moisture: ${soilMoisture.toFixed(3)} m³/m³ (Open-Meteo).`
+                : 'No soil provider returned measurements for these coordinates.'
               : 'Based on ISRIC SoilGrids multi-depth analysis for the selected coordinates.'}
           </p>
         </div>

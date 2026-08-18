@@ -4,6 +4,7 @@ import type { FieldData, Coordinates, WaterSource } from '../types';
 interface FieldDataContextType {
   fieldLocation: Coordinates | null;
   soilType: string;
+  soilMoisture: number | null;
   predictedWaterSource: WaterSource;
   manualWaterSource: WaterSource | null;
   budget: string;
@@ -12,6 +13,7 @@ interface FieldDataContextType {
   analysisData: FieldData | null;
   setFieldLocation: (coords: Coordinates) => void;
   setSoilType: (type: string) => void;
+  setSoilMoisture: (value: number | null) => void;
   setPredictedWaterSource: (source: WaterSource) => void;
   setManualWaterSource: (source: WaterSource | null) => void;
   setBudget: (budget: string) => void;
@@ -32,6 +34,7 @@ const FieldDataContext = createContext<FieldDataContextType | undefined>(undefin
 export function FieldDataProvider({ children }: { children: React.ReactNode }) {
   const [fieldLocation, setFieldLocation] = useState<Coordinates | null>(null);
   const [soilType, setSoilType] = useState<string>('');
+  const [soilMoisture, setSoilMoisture] = useState<number | null>(null);
   const [predictedWaterSource, setPredictedWaterSource] =
     useState<WaterSource>(defaultWaterSource);
   const [manualWaterSource, setManualWaterSource] = useState<WaterSource | null>(null);
@@ -43,6 +46,7 @@ export function FieldDataProvider({ children }: { children: React.ReactNode }) {
   const resetAll = useCallback(() => {
     setFieldLocation(null);
     setSoilType('');
+    setSoilMoisture(null);
     setPredictedWaterSource(defaultWaterSource);
     setManualWaterSource(null);
     setBudget('');
@@ -56,6 +60,7 @@ export function FieldDataProvider({ children }: { children: React.ReactNode }) {
       value={{
         fieldLocation,
         soilType,
+        soilMoisture,
         predictedWaterSource,
         manualWaterSource,
         budget,
@@ -64,6 +69,7 @@ export function FieldDataProvider({ children }: { children: React.ReactNode }) {
         analysisData,
         setFieldLocation,
         setSoilType,
+        setSoilMoisture,
         setPredictedWaterSource,
         setManualWaterSource,
         setBudget,

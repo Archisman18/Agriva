@@ -17,14 +17,15 @@ async def get_soil(
         "value": "mean"
     }
     
-    # Keep the app usable when SoilGrids has no coverage at a coordinate.
+    # Keep the response explicit when SoilGrids has no coverage at a coordinate.
     soil_data = {
-        "soilType": "Loamy (regional estimate)",
-        "ph": 6.8,
-        "nitrogen": 25.0,
+        "soilType": "Soil data unavailable",
+        "ph": None,
+        "nitrogen": None,
         "phosphorus": 15.0, # Not reliably in soilgrids default, keep mock
         "potassium": 100.0,  # Not reliably in soilgrids default, keep mock
-        "source": "Regional estimate (SoilGrids has no data at these coordinates)"
+        "soilMoisture": None,
+        "source": "SoilGrids returned no measurements for these coordinates"
     }
     
     try:
@@ -83,7 +84,28 @@ async def get_soil(
                 
     except Exception as e:
         print(f"SoilGrids API Error: {e}")
-        # Return defaults on error rather than crashing the flow
-        pass
+
+    if soil_data["soilType"] == "Soil data unavailable":
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                moisture_response = await client.get(
+                    "https://api.open-meteo.com/v1/forecast",
+                    params={
+                        "latitude": lat,
+                        "longitude": lng,
+                        "hourly": "soil_moisture_0_to_7cm",
+                        "forecast_days": 1,
+                        "timezone": "auto",
+                    },
+                    headers={"User-Agent": "AgrivaPrecisionFarmingApp/2.1"},
+                )
+                moisture_response.raise_for_status()
+                hourly = moisture_response.json().get("hourly", {})
+                values = hourly.get("soil_moisture_0_to_7cm", [])
+                if values and values[0] is not None:
+                    soil_data["soilMoisture"] = values[0]
+                    soil_data["source"] = "Open-Meteo soil moisture; soil texture unavailable"
+        except Exception as e:
+            print(f"Open-Meteo soil moisture fallback error: {e}")
         
     return soil_data
