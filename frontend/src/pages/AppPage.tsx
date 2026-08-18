@@ -21,6 +21,7 @@ export default function AppPage() {
   const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchRequestRef = useRef(0);
 
   const { soilType } = useFieldData();
   const { getLocation } = useGeolocation();
@@ -91,6 +92,7 @@ export default function AppPage() {
 
   const handleManualLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
+    const requestId = ++searchRequestRef.current;
     setManualLocationInput(val);
     
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
@@ -104,14 +106,19 @@ export default function AppPage() {
     searchTimeoutRef.current = setTimeout(async () => {
       try {
         const results = await searchLocation(val);
+        if (requestId !== searchRequestRef.current) return;
         if (results && results.length > 0) {
           setLocationSuggestions(results);
           setShowSuggestions(true);
         } else {
           setLocationSuggestions([]);
+          setShowSuggestions(false);
         }
       } catch (error) {
+        if (requestId !== searchRequestRef.current) return;
         console.error('Error fetching location suggestions:', error);
+        setLocationSuggestions([]);
+        setShowSuggestions(false);
       }
     }, 100);
   };
