@@ -19,7 +19,10 @@ async def get_water_sources(
     lat: float = Query(..., description="Latitude"),
     lng: float = Query(..., description="Longitude")
 ):
-    overpass_url = "http://overpass-api.de/api/interpreter"
+    overpass_urls = [
+        "https://overpass-api.de/api/interpreter",
+        "https://overpass.kumi.systems/api/interpreter",
+    ]
     
     # Query for water bodies (lakes, rivers, reservoirs, springs) within 5km
     query = f"""
@@ -36,10 +39,22 @@ async def get_water_sources(
     
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
-            response = await client.post(overpass_url, data={"data": query})
-            
-            if response.status_code != 200:
-                raise Exception("Overpass API returned non-200")
+            response = None
+            for overpass_url in overpass_urls:
+                candidate = await client.post(
+                    overpass_url,
+                    data={"data": query},
+                    headers={
+                        "Accept": "application/json",
+                        "User-Agent": "AgrivaPrecisionFarmingApp/2.1",
+                    },
+                )
+                if candidate.status_code == 200:
+                    response = candidate
+                    break
+
+            if response is None:
+                raise Exception("All Overpass API endpoints returned non-200")
                 
             data = response.json()
             elements = data.get("elements", [])

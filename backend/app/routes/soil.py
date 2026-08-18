@@ -28,8 +28,15 @@ async def get_soil(
     }
     
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(url, params=params)
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            response = await client.get(
+                url,
+                params=params,
+                headers={
+                    "Accept": "application/json",
+                    "User-Agent": "AgrivaPrecisionFarmingApp/2.1",
+                },
+            )
             
             if response.status_code == 200:
                 data = response.json()
