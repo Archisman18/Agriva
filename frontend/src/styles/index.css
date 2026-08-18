@@ -488,14 +488,14 @@ section.howitworks ol {
     padding: 0;
 }
 
-section.howitworks ol li {
+section.howitworks ol > li {
     counter-increment: my-awesome-counter;
     margin-bottom: 40px;
     position: relative;
     padding-left: 70px;
 }
 
-section.howitworks ol li::before {
+section.howitworks ol > li::before {
     content: counter(my-awesome-counter);
     position: absolute;
     left: 0;
