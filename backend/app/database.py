@@ -1,39 +1,8 @@
-from motor.motor_asyncio import AsyncIOMotorClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from app.config import settings
 
-# ===== MongoDB =====
-mongo_client: AsyncIOMotorClient | None = None
-mongo_db = None
-
-
-async def connect_mongo():
-    global mongo_client, mongo_db
-    try:
-        mongo_client = AsyncIOMotorClient(settings.mongo_url)
-        mongo_db = mongo_client[settings.mongo_db_name]
-        # Test connection
-        await mongo_client.admin.command("ping")
-        print(f"✅ MongoDB connected: {settings.mongo_db_name}")
-    except Exception as e:
-        print(f"⚠️ MongoDB connection failed: {e}")
-        print("   Running without MongoDB — field data will not persist.")
-        mongo_db = None
-
-
-async def disconnect_mongo():
-    global mongo_client
-    if mongo_client:
-        mongo_client.close()
-        print("MongoDB disconnected.")
-
-
-def get_mongo_db():
-    return mongo_db
-
-
-# ===== PostgreSQL =====
+# ===== Database =====
 pg_engine = None
 AsyncSessionLocal = None
 

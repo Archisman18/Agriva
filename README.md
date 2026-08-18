@@ -3,25 +3,29 @@
 Agriva is an intelligent, AI-powered agricultural planning platform designed to empower farmers with data-driven decision-making. By leveraging real-time satellite data, soil composition analysis, and advanced AI models, Agriva takes the guesswork out of farming and helps optimize crop yields, manage climate risks, and streamline budgeting.
 
 ## 🚀 Key Features
-- **🌍 Interactive Map & Real-time Geocoding**: Instantly search for any field globally using the high-speed Photon API autocomplete, or select coordinates manually via an interactive map.
+- **🌍 Interactive Map & High-Precision Geocoding**: Instantly search for any field globally using Nominatim OpenStreetMap precision autocomplete, or select coordinates manually via CartoDB Voyager maps with satellite tile switching.
 - **🌤️ Hyper-Local Climate & Weather Data**: Integrates with the **Open-Meteo API** to pull real-time elevation, 14-day rainfall probabilities, and 0-7cm soil moisture levels.
 - **🔬 Scientific Soil Analysis**: Connects directly to the **ISRIC SoilGrids API** to determine accurate soil textures (Sand/Silt/Clay ratios), pH levels, and nitrogen content for any GPS coordinate.
 - **💧 Water Source Detection**: Utilizes **OpenStreetMap's Overpass API** to scan a 5km radius for the nearest lakes, rivers, reservoirs, and springs.
-- **🤖 Groq AI Advisor & Analysis Engine**: Powered by **Llama 3.3 70B** via Groq, providing lightning-fast custom crop recommendations, suitability assessments, and dynamic rotation planning based on real geographic variables.
-- **💬 Conversational AI Assistant**: Ask questions and get instant agricultural advice through the integrated chat widget.
+- **🤖 Groq AI Advisor & Analysis Engine**: Powered by **Llama 3.3 70B** via Groq, providing lightning-fast custom crop recommendations, suitability assessments, and dynamic rotation planning in Indian Rupees (₹) based on real geographic variables.
+- **💬 Conversational AI Assistant**: Ask questions and get instant agricultural advice through the integrated chat widget with automated reasoning cleanup.
+- **📱 Responsive & PWA Ready**: Installable Progressive Web App with offline navigation caching and mobile-friendly responsive layout.
 
 ## 🛠️ Tech Stack
 **Frontend:**
 - React 18 & Vite
 - TypeScript
-- Tailwind CSS
-- Leaflet (Interactive Maps)
+- Tailwind CSS & Custom Design System
+- Leaflet & CartoDB (Interactive Maps)
+- PWA / Service Workers
 
 **Backend:**
-- Python 3.13
+- Python 3.11+
 - FastAPI (High-performance API framework)
 - Uvicorn (ASGI server)
 - HTTPX (Async API requests)
+- XGBoost & Scikit-Learn (ML Models)
+- SQLite / SQLAlchemy (Async Local Storage)
 
 ## ⚙️ Local Development Setup
 

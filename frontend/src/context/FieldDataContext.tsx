@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { FieldData, Coordinates, WaterSource } from '../types';
 
 interface FieldDataContextType {
-  referralId: string;
   fieldLocation: Coordinates | null;
   soilType: string;
   predictedWaterSource: WaterSource;
@@ -11,7 +10,6 @@ interface FieldDataContextType {
   availableTools: string;
   desiredCrop: string;
   analysisData: FieldData | null;
-  setReferralId: (id: string) => void;
   setFieldLocation: (coords: Coordinates) => void;
   setSoilType: (type: string) => void;
   setPredictedWaterSource: (source: WaterSource) => void;
@@ -20,7 +18,6 @@ interface FieldDataContextType {
   setAvailableTools: (tools: string) => void;
   setDesiredCrop: (crop: string) => void;
   setAnalysisData: (data: FieldData | null) => void;
-  generateReferralId: () => string;
   resetAll: () => void;
 }
 
@@ -33,7 +30,6 @@ const defaultWaterSource: WaterSource = {
 const FieldDataContext = createContext<FieldDataContextType | undefined>(undefined);
 
 export function FieldDataProvider({ children }: { children: React.ReactNode }) {
-  const [referralId, setReferralId] = useState<string>(() => 'AGRO-' + Math.random().toString(36).substring(2, 10).toUpperCase());
   const [fieldLocation, setFieldLocation] = useState<Coordinates | null>(null);
   const [soilType, setSoilType] = useState<string>('');
   const [predictedWaterSource, setPredictedWaterSource] =
@@ -44,18 +40,7 @@ export function FieldDataProvider({ children }: { children: React.ReactNode }) {
   const [desiredCrop, setDesiredCrop] = useState<string>('');
   const [analysisData, setAnalysisData] = useState<FieldData | null>(null);
 
-  const generateReferralId = useCallback(() => {
-    const id = 'AGRO-' + crypto.randomUUID().substring(0, 8).toUpperCase();
-    setReferralId(id);
-    return id;
-  }, []);
-
-  React.useEffect(() => {
-    generateReferralId();
-  }, [generateReferralId]);
-
   const resetAll = useCallback(() => {
-    generateReferralId();
     setFieldLocation(null);
     setSoilType('');
     setPredictedWaterSource(defaultWaterSource);
@@ -69,7 +54,6 @@ export function FieldDataProvider({ children }: { children: React.ReactNode }) {
   return (
     <FieldDataContext.Provider
       value={{
-        referralId,
         fieldLocation,
         soilType,
         predictedWaterSource,
@@ -78,7 +62,6 @@ export function FieldDataProvider({ children }: { children: React.ReactNode }) {
         availableTools,
         desiredCrop,
         analysisData,
-        setReferralId,
         setFieldLocation,
         setSoilType,
         setPredictedWaterSource,
@@ -87,7 +70,6 @@ export function FieldDataProvider({ children }: { children: React.ReactNode }) {
         setAvailableTools,
         setDesiredCrop,
         setAnalysisData,
-        generateReferralId,
         resetAll,
       }}
     >
