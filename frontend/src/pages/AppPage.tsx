@@ -120,8 +120,13 @@ export default function AppPage() {
     setManualLocationInput(suggestion.display_name);
     setShowSuggestions(false);
     
-    const lat = suggestion.lat;
-    const lng = suggestion.lon;
+    const lat = Number(suggestion.lat);
+    const lng = Number(suggestion.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      setLocationStatus('Location coordinates are invalid. Please try another result.');
+      setLocationStatusClass('text-sm text-red-500 mt-2 font-medium');
+      return;
+    }
     
     setLatInput(lat.toFixed(6));
     setLngInput(lng.toFixed(6));
@@ -291,6 +296,12 @@ export default function AppPage() {
                 onChange={handleManualLocationChange}
                 onFocus={() => {
                   if (locationSuggestions.length > 0) setShowSuggestions(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    void handleSearchLocation();
+                  }
                 }}
                 onBlur={() => {
                   setTimeout(() => setShowSuggestions(false), 200);
