@@ -56,6 +56,19 @@ export default function HowItWorks() {
                 <li>A dashboard summarizing risk levels, resource needs, and cost breakdown</li>
               </ul>
             </li>
+            <li>
+              <h2>6. AI Field Advisor</h2>
+              <p>
+                Once your crop is growing, the AI Field Advisor is available as an in-app chatbot for
+                ongoing support. Describe a field problem in plain language (e.g. a nutrient
+                deficiency or pest issue), and the assistant retrieves your farm's own stored soil and
+                crop data, cross-references it against a crop-specific nutrient and deficiency
+                reference set, and responds with a diagnosis and treatment plan. Recommendations are
+                prioritized organic-first — compost, biofertilizers, and neem-based treatments — with
+                chemical options mentioned only as a general fallback. Voice input in regional
+                languages is supported via Bhashini for accessibility.
+              </p>
+            </li>
           </ol>
         </div>
       </div>
