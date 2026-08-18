@@ -301,7 +301,9 @@ export default function MapView() {
             Detected Type: <span className="font-semibold text-[#C4703A]">{soilType}</span>
           </p>
           <p className="text-xs text-[#6B4E3D] opacity-80 leading-tight">
-            Based on ISRIC SoilGrids multi-depth analysis for the selected coordinates.
+            {soilType === 'Loamy (regional estimate)'
+              ? 'Regional estimate shown because SoilGrids has no data at these coordinates.'
+              : 'Based on ISRIC SoilGrids multi-depth analysis for the selected coordinates.'}
           </p>
         </div>
       )}

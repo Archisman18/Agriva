@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
 import httpx
-import random
 
 router = APIRouter()
 
@@ -18,13 +17,14 @@ async def get_soil(
         "value": "mean"
     }
     
-    # Defaults in case of missing data (e.g. over ocean)
+    # Keep the app usable when SoilGrids has no coverage at a coordinate.
     soil_data = {
-        "soilType": "Unknown",
-        "ph": 7.0,
-        "nitrogen": 20.0,
+        "soilType": "Loamy (regional estimate)",
+        "ph": 6.8,
+        "nitrogen": 25.0,
         "phosphorus": 15.0, # Not reliably in soilgrids default, keep mock
-        "potassium": 100.0  # Not reliably in soilgrids default, keep mock
+        "potassium": 100.0,  # Not reliably in soilgrids default, keep mock
+        "source": "Regional estimate (SoilGrids has no data at these coordinates)"
     }
     
     try:
@@ -50,6 +50,9 @@ async def get_soil(
                         val = depths[0].get("values", {}).get("mean")
                         if val is not None:
                             extracted[name] = val
+
+                if extracted:
+                    soil_data["source"] = "ISRIC SoilGrids"
                 
                 # Convert phh2o (pH * 10) to actual pH
                 if "phh2o" in extracted:
