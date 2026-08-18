@@ -7,3 +7,7 @@ aiosqlite
 httpx
 python-dotenv
 google-generativeai
+pandas
+scikit-learn
+xgboost
+numpy
