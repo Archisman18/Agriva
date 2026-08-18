@@ -3,10 +3,54 @@ import httpx
 
 router = APIRouter()
 
+REGIONAL_SOIL_TEXTURES = {
+    "jammu": "Gravelly sandy loam to silt loam",
+    "kashmir": "Gravelly sandy loam to silt loam",
+    "ladakh": "Gravelly sandy loam to silt loam",
+    "himachal": "Loam and silt loam in valleys; gravelly clay on slopes",
+    "uttarakhand": "Stony coarse sandy loam to fertile clay loam",
+    "punjab": "Deep sandy loam, loam, and silt loam",
+    "haryana": "Sandy loam to clay loam",
+    "delhi": "Sandy loam to silt loam on the Indo-Gangetic alluvial plain",
+    "rajasthan": "Coarse sand, loamy sand, and sandy loam",
+    "gujarat": "Sandy clay loam to heavy clayey black soil",
+    "madhya pradesh": "Deep fine clayey black soil with sandy loam",
+    "chhattisgarh": "Gravelly sandy loam to heavy clayey soil",
+    "uttar pradesh": "Silt loam, sandy loam, and heavy clay loam",
+    "bihar": "Fertile silt loam and sandy clay loam",
+    "west bengal": "Alluvial loam and deltaic silt clay to lateritic loam",
+    "jharkhand": "Gravelly sandy clay loam and red loam",
+    "odisha": "Red sandy loam to heavy deltaic clay",
+    "assam": "Acidic silty loam and rich alluvial loam",
+    "meghalaya": "Fine silty loam to acidic lateritic clayey loam",
+    "nagaland": "Fine silty loam to acidic lateritic clayey loam",
+    "manipur": "Fine silty loam to acidic lateritic clayey loam",
+    "mizoram": "Fine silty loam to acidic lateritic clayey loam",
+    "tripura": "Fine silty loam to acidic lateritic clayey loam",
+    "arunachal": "Fine silty loam to acidic lateritic clayey loam",
+    "sikkim": "Fine silty loam to acidic lateritic clayey loam",
+    "maharashtra": "Deep fine clayey black soil; gravelly lateritic loam in Konkan",
+    "karnataka": "Red sandy loam to deep clayey and lateritic clay",
+    "andhra pradesh": "Light red sandy loam to deep deltaic black clay",
+    "telangana": "Light red sandy loam to deep deltaic black clay",
+    "tamil nadu": "Red loam, black clayey soil, and coastal sand",
+    "kerala": "Acidic lateritic gravelly clay to coastal peaty clay",
+}
+
+def regional_texture(location: str | None) -> str | None:
+    if not location:
+        return None
+    normalized = location.lower().replace("&amp;", "&")
+    for region, texture in REGIONAL_SOIL_TEXTURES.items():
+        if region in normalized:
+            return texture
+    return None
+
 @router.get("")
 async def get_soil(
     lat: float = Query(..., description="Latitude"),
-    lng: float = Query(..., description="Longitude")
+    lng: float = Query(..., description="Longitude"),
+    location: str | None = Query(None, description="Selected city or region")
 ):
     url = "https://rest.isric.org/soilgrids/v2.0/properties/query"
     params = {
@@ -84,6 +128,11 @@ async def get_soil(
                 
     except Exception as e:
         print(f"SoilGrids API Error: {e}")
+
+    supplied_texture = regional_texture(location)
+    if supplied_texture:
+        soil_data["soilType"] = supplied_texture
+        soil_data["source"] = f"Agriva regional soil dataset ({location})"
 
     if soil_data["soilType"] == "Soil data unavailable":
         try:

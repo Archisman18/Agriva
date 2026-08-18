@@ -26,13 +26,13 @@ export default function AppPage() {
   const { soilType } = useFieldData();
   const { getLocation } = useGeolocation();
 
-  const callUpdateMap = (lat: number, lng: number) => {
+  const callUpdateMap = (lat: number, lng: number, location?: string) => {
     const tryUpdateMap = (attempt: number) => {
       const updateMap = (window as unknown as Record<string, unknown>).__agriva_updateMap as
-        | ((lat: number, lng: number) => void)
+        | ((lat: number, lng: number, location?: string) => void)
         | undefined;
       if (updateMap) {
-        updateMap(lat, lng);
+        updateMap(lat, lng, location);
       } else if (attempt < 10) {
         window.setTimeout(() => tryUpdateMap(attempt + 1), 50);
       }
@@ -142,7 +142,7 @@ export default function AppPage() {
     
     setLatInput(lat.toFixed(6));
     setLngInput(lng.toFixed(6));
-    callUpdateMap(lat, lng);
+    callUpdateMap(lat, lng, suggestion.display_name);
     
     setLocationStatus(`Location found: ${suggestion.display_name}`);
     setLocationStatusClass('text-sm text-green-700 mt-2 font-medium');

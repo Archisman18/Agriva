@@ -101,11 +101,11 @@ export default function MapView() {
   }, [isSatelliteView]);
 
   const determineSoilType = useCallback(
-    async (lat: number, lng: number) => {
+    async (lat: number, lng: number, location?: string) => {
       setSoilType('Analyzing...');
       try {
         const { getSoilData } = await import('../services/api');
-        const data = await getSoilData(lat, lng);
+        const data = await getSoilData(lat, lng, location);
         setSoilType(data.soilType);
         setSoilMoisture(data.soilMoisture ?? null);
       } catch (error) {
@@ -134,7 +134,7 @@ export default function MapView() {
   );
 
   const updateMap = useCallback(
-    (lat: number, lng: number) => {
+    (lat: number, lng: number, location?: string) => {
       const map = mapRef.current;
       if (!map || isNaN(lat) || isNaN(lng)) return;
 
@@ -158,7 +158,7 @@ export default function MapView() {
         .openPopup();
 
       setFieldLocation({ lat, lng });
-      determineSoilType(lat, lng);
+      determineSoilType(lat, lng, location);
       determinePredictedWaterSource(lat, lng);
     },
     [setFieldLocation, determineSoilType, determinePredictedWaterSource]

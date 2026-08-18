@@ -33,8 +33,12 @@ export async function getWeather(lat: number, lng: number): Promise<WeatherRespo
 
 // ===== Soil =====
 
-export async function getSoilData(lat: number, lng: number): Promise<SoilResponse> {
-  const response = await api.get('/soil', { params: { lat, lng } });
+export async function getSoilData(
+  lat: number,
+  lng: number,
+  location?: string
+): Promise<SoilResponse> {
+  const response = await api.get('/soil', { params: { lat, lng, location } });
   return response.data;
 }
 
