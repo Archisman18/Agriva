@@ -21,6 +21,17 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
+@app.get("/")
+async def root():
+    return {
+        "status": "ok",
+        "message": "Agriva backend is running",
+        "docs": "/docs",
+        "health": "/api/health",
+    }
+
+
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
