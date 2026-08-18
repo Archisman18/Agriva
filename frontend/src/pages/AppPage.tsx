@@ -27,12 +27,17 @@ export default function AppPage() {
   const { getLocation } = useGeolocation();
 
   const callUpdateMap = (lat: number, lng: number) => {
-    const updateMap = (window as unknown as Record<string, unknown>).__agriva_updateMap as
-      | ((lat: number, lng: number) => void)
-      | undefined;
-    if (updateMap) {
-      updateMap(lat, lng);
-    }
+    const tryUpdateMap = (attempt: number) => {
+      const updateMap = (window as unknown as Record<string, unknown>).__agriva_updateMap as
+        | ((lat: number, lng: number) => void)
+        | undefined;
+      if (updateMap) {
+        updateMap(lat, lng);
+      } else if (attempt < 10) {
+        window.setTimeout(() => tryUpdateMap(attempt + 1), 50);
+      }
+    };
+    tryUpdateMap(0);
   };
 
   const handleGpsLocation = () => {

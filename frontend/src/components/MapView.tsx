@@ -140,7 +140,14 @@ export default function MapView() {
       if (fieldMarkerRef.current) {
         fieldMarkerRef.current.setLatLng(newLatLng);
       } else {
-        fieldMarkerRef.current = L.marker(newLatLng).addTo(map);
+        fieldMarkerRef.current = L.marker(newLatLng, {
+          icon: L.divIcon({
+            className: 'custom-div-icon',
+            html: '<i class="fa-solid fa-location-dot text-[#C4703A] text-4xl" style="filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.35));"></i>',
+            iconSize: [36, 36],
+            iconAnchor: [18, 36],
+          }),
+        }).addTo(map);
       }
       fieldMarkerRef.current
         .bindPopup(`<b>Field Location</b><br>${lat.toFixed(4)}, ${lng.toFixed(4)}`)
