@@ -292,52 +292,65 @@ export default function AppPage() {
             </div>
           )}
 
-          {/* Location Autocomplete Input */}
-          <div className="relative z-50">
-            <label className="block text-gray-700 text-sm font-semibold mb-2">
-              Or search for a region / city:
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i className="fa-solid fa-magnifying-glass text-gray-400"></i>
-              </div>
-              <input
-                type="text"
-                placeholder="e.g., Nile Delta, Egypt"
-                value={manualLocationInput}
-                onChange={handleManualLocationChange}
-                onFocus={() => {
-                  if (locationSuggestions.length > 0) setShowSuggestions(true);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    void handleSearchLocation();
-                  }
-                }}
-                onBlur={() => {
-                  setTimeout(() => setShowSuggestions(false), 200);
-                }}
-                className="glass-input w-full"
-                style={{ paddingLeft: '2.75rem' }}
-              />
-            </div>
-            
-            {showSuggestions && locationSuggestions.length > 0 && (
-              <ul className="absolute z-[100] w-full bg-white/95 backdrop-blur-xl border border-gray-200 mt-2 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
-                {locationSuggestions.map((sug, index) => (
-                  <li 
-                    key={index} 
-                    className="px-4 py-3 hover:bg-green-50 cursor-pointer border-b border-gray-100/50 text-sm text-gray-700 transition-colors"
-                    onClick={() => handleSelectSuggestion(sug)}
+            {/* Location Autocomplete Input */}
+            <div className="relative z-50">
+              <label className="block text-gray-700 text-sm font-semibold mb-2">
+                Or search for a region / city:
+              </label>
+              <div className="relative flex items-center">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i className="fa-solid fa-magnifying-glass text-gray-400"></i>
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g., Nile Delta, Egypt or Punjab, India"
+                  value={manualLocationInput}
+                  onChange={handleManualLocationChange}
+                  onFocus={() => {
+                    if (locationSuggestions.length > 0) setShowSuggestions(true);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      void handleSearchLocation();
+                    }
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => setShowSuggestions(false), 250);
+                  }}
+                  className="glass-input w-full pr-12"
+                  style={{ paddingLeft: '2.75rem' }}
+                />
+                {manualLocationInput && (
+                  <button
+                    type="button"
+                    onClick={() => void handleSearchLocation()}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#2F5233] text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#3c6e42] transition-colors shadow-sm"
+                    title="Search location"
                   >
-                    <i className="fa-solid fa-map-pin text-green-500 mr-2 opacity-70"></i>
-                    {sug.display_name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+                    <i className="fa-solid fa-arrow-right text-xs"></i>
+                  </button>
+                )}
+              </div>
+              
+              {showSuggestions && locationSuggestions.length > 0 && (
+                <ul className="absolute z-[100] w-full bg-white/95 backdrop-blur-xl border border-gray-200 mt-2 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
+                  {locationSuggestions.map((sug, index) => (
+                    <li 
+                      key={index} 
+                      className="px-4 py-3 hover:bg-green-50 cursor-pointer border-b border-gray-100/50 text-sm text-gray-700 transition-colors flex items-center gap-2"
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // Prevents onBlur from closing before click registers
+                        handleSelectSuggestion(sug);
+                      }}
+                    >
+                      <i className="fa-solid fa-map-pin text-green-600 shrink-0"></i>
+                      <span className="truncate">{sug.display_name}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           
           {locationStatus && (
             <div className={`mt-4 px-4 py-2 rounded-lg bg-white/50 border border-white/60 ${locationStatusClass}`}>
